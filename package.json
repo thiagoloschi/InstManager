@@ -1,6 +1,6 @@
 {
   "name": "InstManager",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "A client manager for Instagram accounts",
   "main": "server.js",
   "scripts": {
