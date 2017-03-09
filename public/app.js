@@ -9,6 +9,14 @@ instApp.config(function($routeProvider){
 		controller:'mainController',
 		templateUrl: 'views/main.html'
 	})
+	$routeProvider.when('/relationships', {
+		controller:'relationshipsController',
+		templateUrl: 'views/relationships.html'
+	})
+	$routeProvider.when('/stats', {
+		controller:'statsController',
+		templateUrl: 'views/stats.html'
+	})
 	.otherwise({
 		redirectTo: '/'
 	});

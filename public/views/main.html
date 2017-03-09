@@ -1,4 +1,22 @@
 <div class="container main" ng-init="getUser()">
+
+	<div class="nav">
+		<div class="navbar-header">
+		  <span id="fst" class="navbar-brand">Hi <strong>{{user.username}}</strong>, what would you like to do?</span>
+		</div>
+		<div id="navbar" class="navbar-collapse collapse">
+		  <ul class="nav navbar-nav">
+			<li><a href="#!/relationships">Manage My Relationships</a></li>
+			<li><a href="#!/stats">See My Statistics</a></li>
+			<li><a href="/">Logout</a></li>
+		  </ul>
+		</div>
+	</div>
+
+	<hr>
+
+	<br><br>
+
 	<div class="profile">
 		<div class="row">
 			<div class="username">
@@ -11,6 +29,8 @@
 				"{{user.bio}}"
 			</div>
 		</div>
+		<br>
+		<hr>
 		<div class="row">
 			<div class="col-xs-4">
 				<h3><strong>{{user.counts.followed_by}}</strong></h3>
@@ -24,6 +44,21 @@
 				<h3><strong>{{user.counts.media}}</strong></h3>
 				Medias
 			</div>
+		</div>
+
+	</div>
+	<hr>
+
+	<br><br><br>
+
+
+	<div class="row medias" ng-init="getMedias()">
+		<div  ng-repeat="media in medias">
+			<div class="pictures col-md-3 col-sm-4 col-xs-6 col-lg-2">
+				<img class="photos img-thumbnail" src="{{media.images.thumbnail.url}}" title="{{media.caption.text}}" alt="{{media.caption.text}}"/ >
+				<p><strong>{{media.likes.count}}</strong> likes</p>
+			</div>
+
 		</div>
 	</div>
 </div>
