@@ -1,0 +1,77 @@
+*{
+	padding: 0;
+	margin: 0;
+}
+/* Header */
+
+.header{
+	background: rgb(153,47,255) fixed;
+	background: rgba(153,47,255,1) fixed;
+    /*background: -moz-linear-gradient(left, rgba(153,47,255,1) 0%, rgba(39,139,255,1) 100%);
+	background: -o-linear-gradient(left, rgba(153,47,255,1) 0%, rgba(39,139,255,1) 100%);
+    background: -ms-linear-gradient(left, rgba(153,47,255,1) 0%, rgba(39,139,255,1) 100%);*/
+	background: -webkit-gradient(left top, right top, color-stop(0%, rgba(240, 84, 79,1)), color-stop(100%, rgba(39,139,255,1)));
+    background: -webkit-linear-gradient(left, rgba(240, 84, 79,1) 0%, rgba(153,47,255,1) 100%);
+    background: linear-gradient(to right, rgba(240, 84, 79,1) 0%, rgba(153,47,255,1) 100%);
+	color: white;
+}
+
+.logo{
+	text-align: center;
+	padding: 30px;
+	font-family: 'Amatic SC', cursive;
+	font-size: 85px;
+	letter-spacing: 8px;
+}
+
+.nav{
+	text-align: center;
+}
+
+/* Tags */
+
+hr{
+	border-bottom-color: black;
+}
+
+/* Main page */
+
+.main{
+	text-align: center;
+	margin: auto;
+	font-family: 'Raleway', sans-serif;
+}
+
+.username{
+	text-align: center;
+}
+
+.profile{
+	margin: auto;
+	text-align: center;
+}
+
+.medias{
+	text-align: center;
+	margin: auto;
+}
+
+.pictures{
+	margin-bottom: 30px;
+}
+
+.photos{
+	padding: 15px 0;
+}
+
+/* RELATIONSHIPS */
+
+.thumb-sm {
+    height: 32px;
+    width: 32px;
+}
+.thumb-sm img {
+    height: auto;
+    max-width: 100%;
+    vertical-align: middle;
+}
