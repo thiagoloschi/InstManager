@@ -15,4 +15,13 @@ instApp.controller('statsController', ['$scope', '$http', '$location', '$routePa
 			$scope.tags = response.data;
 		})
 	}
+
+    $scope.getStats = function(){
+        $http.get('/data/stats').then(function(response) {
+            $scope.taggedUsers = response.data.tagged_users;
+            $scope.places = response.data.places;
+            $scope.totalLikes = response.data.totalLikes;
+            console.log(response.data);
+        })
+    }
 }]);

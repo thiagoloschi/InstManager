@@ -18,8 +18,31 @@
 	<br><br>
 
 	<div class="row">
-		<div class="card col-md-4"></div>
-		<div class="card col-md-4 col-sm-6">
+		<div class="card col-md-4">
+			<div class="card-header">
+				<h4>
+					Top<strong> 10 </strong>
+					Most Tagged Friends
+				</h4>
+			</div>
+			<div ng-init="getStats()" class="card-body">
+				<ul class="list-group list-group-lg">
+					<li class="list-group-item" ng-repeat="tagged in taggedUsers">
+
+						<div class="card-line row">
+							<div class="col-sm-9">
+								<a href="#">{{tagged.username}}</a>
+							</div>
+							<div class="col-sm-3">
+								<strong>{{tagged.freq}}</strong>x
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="card col-md-4">
 			<div class="card-header">
 				<h4>
 					Top<strong> 10 </strong>
@@ -32,7 +55,7 @@
 
 						<div class="card-line row">
 							<div class="col-sm-6">
-								#{{tag.name}}
+								<a href="#">#{{tag.name}}</a>
 							</div>
 							<div class="col-sm-6">
 								<strong>{{tag.freq}}</strong>x
@@ -42,6 +65,29 @@
 				</ul>
 			</div>
 		</div>
-		<div class="card col-md-4"></div>
+
+		<div class="card col-md-4 col-sm-12">
+			<div class="card-header">
+				<h4>
+					Top<strong> 10 </strong>
+					Last Visited Places
+				</h4>
+			</div>
+			<div class="card-body">
+				<ul class="list-group list-group-lg">
+					<li class="list-group-item" ng-repeat="place in places">
+
+						<div class="card-line row">
+							<div class="col-sm-9">
+								<a href="#">{{place.name}}</a>
+							</div>
+							<div class="col-sm-3">
+								<strong>{{place.freq}}</strong>x
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
 	</div>
 </div>

@@ -141,29 +141,6 @@ exports.getMedias = function(req, res) {
 			}
 		});
 	}else{
-		var tags = []; //all tags
-		var dicTags = [];
-
-		_.forEach(user.medias, function(media) {
-			_.forEach(media.tags, function(tag) {
-				tags.push(tag);
-			});
-		});
-
-		tags = _.countBy(tags);
-
-		_.forEach(tags, function(value, key) {
-			dicTags.push({
-    			name: key,
-    			freq: value
-			});
-		});
-
-		dicTags = _.orderBy(dicTags, 'freq', 'desc');
-
-		console.log('\n\n\ttags', dicTags);
-
-
 		res.send(user.medias);
 	}
 };
@@ -198,6 +175,62 @@ exports.getTags = function(req, res) {
 	}
 };
 
+exports.getStats = function(req, res) {
+	var totalLikes = 0;
+	var location = [];
+	var dicLocal = [];
+	var tagged = [];
+	var dicTagged = [];
+
+	//location and total of likes
+	_.forEach(user.medias, function(media) {
+		totalLikes += media.likes.count;
+		if(media.location != null)
+			location.push(media.location.name);
+	});
+
+	location = _.countBy(location);
+
+	_.forEach(location, function(value, key) {
+		dicLocal.push({
+			name: key,
+			freq: value
+		});
+	});
+
+	dicLocal = _.orderBy(dicLocal, 'freq', 'desc');
+	dicLocal = _.slice(dicLocal, 0, 10);
+
+
+	//user tagged in the photos
+	_.forEach(user.medias, function(line) {
+		_.forEach(line.users_in_photo, function(u) {
+			tagged.push(u.user.username);
+		});
+	});
+
+	tagged = _.countBy(tagged);
+
+
+	_.forEach(tagged, function(value, key) {
+		dicTagged.push({
+			username: key,
+			freq: value
+		});
+	});
+
+	dicTagged = _.orderBy(dicTagged, 'freq', 'desc');
+	dicTagged = _.slice(dicTagged, 0, 10);
+
+	var stats = {
+		totalLikes: totalLikes,
+		places: dicLocal,
+		tagged_users: dicTagged
+	};
+
+	res.send(stats);
+}
+
 //------------------------ ROUTES --------------------------
 
 app.get('/', function(req, res) {
@@ -217,6 +250,7 @@ app.get('/data/notfollowings', exports.getNotFollowings);
 app.get('/data/notfollowers', exports.getNotFollowers);
 app.get('/data/medias', exports.getMedias);
 app.get('/data/tags', exports.getTags);
+app.get('/data/stats', exports.getStats);
 
 
 app.listen(5000);
