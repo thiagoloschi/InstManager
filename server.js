@@ -24,7 +24,7 @@ exports.authorize_user = function(req, res){
 		client_id: api.client_id,
 		client_secret: api.client_secret,
 	});
-	user = new User(null, null, null, null, null, null, null);
+	user = new User(null, null, null, null, null, null, null, null);
 	res.redirect(ig.get_authorization_url(api.redirect_uri, { scope: ['basic follower_list relationships']}));
 };
 
@@ -141,8 +141,60 @@ exports.getMedias = function(req, res) {
 			}
 		});
 	}else{
+		var tags = []; //all tags
+		var dicTags = [];
+
+		_.forEach(user.medias, function(media) {
+			_.forEach(media.tags, function(tag) {
+				tags.push(tag);
+			});
+		});
+
+		tags = _.countBy(tags);
+
+		_.forEach(tags, function(value, key) {
+			dicTags.push({
+    			name: key,
+    			freq: value
+			});
+		});
+
+		dicTags = _.orderBy(dicTags, 'freq', 'desc');
+
+		console.log('\n\n\ttags', dicTags);
+
 
 		res.send(user.medias);
+	}
+};
+
+exports.getTags = function(req, res) {
+	if (user.tags == null) {
+		var tags = []; //all tags
+		var dicTags = [];
+
+		_.forEach(user.medias, function(media) {
+			_.forEach(media.tags, function(tag) {
+				tags.push(tag);
+			});
+		});
+
+		tags = _.countBy(tags);
+
+		_.forEach(tags, function(value, key) {
+			dicTags.push({
+    			name: key,
+    			freq: value
+			});
+		});
+
+		dicTags = _.orderBy(dicTags, 'freq', 'desc');
+
+		user.tags = _.slice(dicTags, 0, 10);
+
+		res.send(user.tags);
+	}else{
+		res.send(user.tags);
 	}
 };
 
@@ -164,6 +216,8 @@ app.get('/data/followings', exports.getFollowings);
 app.get('/data/notfollowings', exports.getNotFollowings);
 app.get('/data/notfollowers', exports.getNotFollowers);
 app.get('/data/medias', exports.getMedias);
+app.get('/data/tags', exports.getTags);
+
 
 app.listen(5000);
 console.log('InstManager is now running...');

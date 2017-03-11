@@ -17,5 +17,31 @@
 
 	<br><br>
 
-    <center><h3>Statistics Page</h3></center>
+	<div class="row">
+		<div class="card col-md-4"></div>
+		<div class="card col-md-4 col-sm-6">
+			<div class="card-header">
+				<h4>
+					Top<strong> 10 </strong>
+					Most Used Tags
+				</h4>
+			</div>
+			<div ng-init="getTags()" class="card-body">
+				<ul class="list-group list-group-lg">
+					<li class="list-group-item" ng-repeat="tag in tags">
+
+						<div class="card-line row">
+							<div class="col-sm-6">
+								#{{tag.name}}
+							</div>
+							<div class="col-sm-6">
+								<strong>{{tag.freq}}</strong>x
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="card col-md-4"></div>
+	</div>
 </div>

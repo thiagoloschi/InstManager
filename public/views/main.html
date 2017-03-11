@@ -58,7 +58,7 @@
 				<img class="photos img-thumbnail" src="{{media.images.thumbnail.url}}" title="{{media.caption.text}}" alt="{{media.caption.text}}"/ >
 				<p><strong>{{media.likes.count}}</strong> likes</p>
 			</div>
-
 		</div>
 	</div>
+	<div ng-controller="relationshipsController" ng-init="getFollowings(); getFollowers()"></div>
 </div>

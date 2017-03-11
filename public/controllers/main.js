@@ -10,12 +10,9 @@ instApp.controller('mainController', ['$scope', '$http', '$location', '$routePar
 		})
 	}
 
-
-
 	$scope.getMedias = function(){
 		$http.get('/data/medias').then(function(response) {
 			$scope.medias = response.data;
-			console.log(response.data);
 		})
 	}
 }]);

@@ -1,4 +1,4 @@
-module.exports = function ( id, basicInfo, followers, followings, notFollowings, notFollowers, medias) {
+module.exports = function ( id, basicInfo, followers, followings, notFollowings, notFollowers, medias, tags) {
     this.id = id;
 	this.basicInfo = basicInfo;
 	this.followers = followers;
@@ -6,4 +6,5 @@ module.exports = function ( id, basicInfo, followers, followings, notFollowings,
 	this.notFollowings = notFollowings;
     this.notFollowers = notFollowers;
 	this.medias = medias;
+    this.tags = tags;
 };
