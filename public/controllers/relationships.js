@@ -19,21 +19,14 @@ instApp.controller('relationshipsController', ['$scope', '$http', '$location', '
     $scope.getFollowings = function(){
         $http.get('/data/followings').then(function(response) {
             $scope.followings = response.data;
-            console.log($scope.followings);
         })
     }
 
     $scope.getNotFollowings = function(){
-        $http.get('/data/notfollowings').then(function(response) {
-            $scope.notFollowings = response.data;
-            console.log($scope.notFollowings);
-        })
-    }
-
-    $scope.getNotFollowers = function(){
-        $http.get('/data/notfollowers').then(function(response) {
-            $scope.notFollowers = response.data;
-            console.log($scope.notFollowers);
+        $http.get('/data/notrelated').then(function(response) {
+            $scope.notFollowings = response.data.notFollowings;
+            $scope.notFollowers = response.data.notFollowers;
+            console.log(response.data);
         })
     }
 

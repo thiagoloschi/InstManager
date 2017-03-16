@@ -1,10 +1,19 @@
-module.exports = function ( id, basicInfo, followers, followings, notFollowings, notFollowers, medias, tags) {
-    this.id = id;
-	this.basicInfo = basicInfo;
-	this.followers = followers;
-	this.followings = followings;
-	this.notFollowings = notFollowings;
-    this.notFollowers = notFollowers;
-	this.medias = medias;
-    this.tags = tags;
-};
+var mongoose = require('mongoose');
+
+//Student Schema
+var userSchema = mongoose.Schema({
+    cod: Number,
+    username: String,
+    token: String,
+    basicInfo: Array,
+	followers: Array,
+	followings: Array,
+	notRelated: {
+        notFollowers: Array,
+        notFollowings: Array
+    },
+	medias: Array
+});
+
+//Makes object acessible from outside
+var User = module.exports = mongoose.model('User', userSchema);

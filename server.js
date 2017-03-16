@@ -1,15 +1,13 @@
 //'use strict';
-var express = require('express');
-var app = express();
-var https = require('https');
-var rqst = require('request-promise')
 var bodyParser = require('body-parser');
+var express = require('express');
+var mongoose = require('mongoose');
+var https = require('https');
+var session = require('client-sessions');
+var rqst = require('request-promise')
 var _ = require('lodash');
-var ig = require('instagram-node').instagram();
-var user;
 
-app.use(express.static(__dirname+'/public'));
-app.use(bodyParser.json());
+var Schema = mongoose.Schema;
 
 //Creates the api object
 api = require('./models/api.js');
@@ -17,14 +15,37 @@ api = require('./models/api.js');
 //Creates the user object that will work as a sort of pagination to avoid unecessary requests to the server
 User = require('./models/user.js');
 
+//Initiates the API for Instagram login handler
+var ig = require('instagram-node').instagram();
+
+//Initiates the express application
+var app = express();
+
+//Connects to mongodb
+mongoose.connect('mongodb://localhost/instmanager');
+
+//Middlewares
+app.use(express.static(__dirname+'/public'));
+app.use(bodyParser.json());
+
+//Sets the client cookie and creates a session
+app.use(session({
+  cookieName: 'session',
+  //this will become an enviroment variable with the proper secret
+  secret: 'issoVAIvirarENVvar',
+  duration: 30 * 60 * 1000,
+  activeDuration: 5 * 60 * 1000,
+  ephemeral: true
+}));
+
 //Starts user's autentication and creates a blank user object
 exports.authorize_user = function(req, res){
-	//Sets up the Instagram API
+	//Sets up the API keys
 	ig.use({
 		client_id: api.client_id,
 		client_secret: api.client_secret,
 	});
-	user = new User(null, null, null, null, null, null, null, null);
+
 	res.redirect(ig.get_authorization_url(api.redirect_uri, { scope: ['basic follower_list relationships']}));
 };
 
@@ -35,14 +56,36 @@ exports.handleauth = function(req, res) {
 		  console.log(err.body);
 		  res.send("An error occurred when trying to authorize user.");
 		} else {
-		  console.log('Access token ' + result.access_token + ' successfuly authorized');
-		  user.id = result.user.id;
-		  api.access_token = result.access_token
-		  ig.use({
-			client_id: api.client_id,
-			client_secret: api.client_secret,
-			access_token: api.access_token
+		  console.log('Access token successfuly aquired');
+		  req.session.cod = result.user.id;
+		  req.session.name = result.user.username;
+		  User.findOne({ cod: req.session.cod }, function(err, user) {
+			  if (user) {
+				  User.deleteOne({ cod: req.session.cod }, function (err) {
+					  console.log('User ',req.session.name, ' was deleted before application started.');
+				  });
+			  }
+			  var user = new User({
+				cod: result.user.id,
+				username: result.user.username,
+				token: result.access_token,
+				basicInfo: null,
+				followers: null,
+				followings: null,
+				notRelated: null,
+				medias: null
+			  });
+			  user.save(function(err){
+				 if(err){
+					 var err = 'An error occurred when trying to save user to DB';
+					 console.log(err);
+				 }else {
+				   console.log('User ' + user.username + ' was successfuly saved to DB.');
+				 }
+
+			 })
 		  });
+
 		  res.redirect('http://localhost:5000/#!/main');
 		}
 	});
@@ -51,53 +94,168 @@ exports.handleauth = function(req, res) {
 //------------------ API METHODS ----------------------//
 
 exports.getBasicInfo = function (req, res) {
-	if (user.basicInfo == null){
-		ig.user( user.id.toString(), function(err, result, remaining, limit) {
-			if (err) {
-			  console.log('An error occurred when trying to get the user basic info.\nCod: ' + err.code + '\nInstagram message: ' + err.error_message);
-			} else {
-			  console.log('User basic info was successfuly requested.');
-			  user.basicInfo = result;
-			  res.send(user.basicInfo);
-			}
-		});
-	}else{
-		res.send(user.basicInfo);
-	}
+	User.findOne({ cod: req.session.cod }, function(err, user) {
+		if (user) {
+			res.locals.user = user;
+		}else {
+			res.redirect('/login');
+		}
+		if (user.basicInfo == null){
+			var options = {
+		    	uri: 'https://api.instagram.com/v1/users/self/',
+		    	qs: {
+		        	access_token: user.token
+		    	},
+		    	headers: {
+		        	'User-Agent': 'Request-Promise'
+		    	},
+		    	json: true
+				};
+
+			rqst(options)
+			    .then(function (data) {
+					user.basicInfo = data.data;
+					user.save(function(err){
+		  			  if(err){
+		  				  var err = 'An error occurred when trying to save user to DB';
+		  				  console.log(err);
+		  			  }else {
+		  			  	console.log('User ' + user.username + ' successfuly updated basicInfo.');
+		  			  }
+		  		  	})
+					res.send(user.basicInfo);
+			    })
+			    .catch(function (err) {
+			        console.log('An error ocurred when requesting the basics', err);
+			    });
+		}else{
+			res.send(user.basicInfo);
+		}
+	});
 };
 
 exports.getFollowers = function (req, res) {
-	if(user.followers == null){
-		var options = {
-    	uri: 'https://api.instagram.com/v1/users/self/followed-by',
-    	qs: {
-        	access_token: api.access_token
-    	},
-    	headers: {
-        	'User-Agent': 'Request-Promise'
-    	},
-    	json: true
-		};
+	User.findOne({ cod: req.session.cod }, function(err, user) {
+		if (user) {
+			res.locals.user = user;
+		}else {
+			res.redirect('/login');
+		}
+		if(user.followers == null){
+			var options = {
+	    	uri: 'https://api.instagram.com/v1/users/self/followed-by',
+	    	qs: {
+	        	access_token: user.token
+	    	},
+	    	headers: {
+	        	'User-Agent': 'Request-Promise'
+	    	},
+	    	json: true
+			};
 
-	rqst(options)
-	    .then(function (data) {
-			user.followers = _.drop(data.data, 1);
+		rqst(options)
+		    .then(function (data) {
+				user.followers = data.data, 1;
+				user.save(function(err){
+				  if(err){
+					  var err = 'An error occurred when trying to save user to DB at getFollowers';
+					  console.log(err);
+				  }else {
+					  console.log('User ' + user.username + ' successfuly updated its followers.');
+				  }
+				})
+				res.send(data.data);
+		    })
+		    .catch(function (err) {
+		        console.log('An error ocurred when requesting the followers');
+		    });
+		}else{
 			res.send(user.followers);
-	    })
-	    .catch(function (err) {
-	        console.log('An error ocurred when requesting the followers');
-	    });
-	}else{
-		res.send(user.followers);
-	}
+		}
+	});
 };
 
-exports.getFollowings = function(req, res) {
-	if(user.followings == null){
+exports.getFollowings = function (req, res) {
+	User.findOne({ cod: req.session.cod }, function(err, user) {
+		if (user) {
+			res.locals.user = user;
+		}else {
+			res.redirect('/login');
+		}
+		if(user.followings == null){
+			var options = {
+	    	uri: 'https://api.instagram.com/v1/users/self/follows',
+	    	qs: {
+	        	access_token: user.token
+	    	},
+	    	headers: {
+	        	'User-Agent': 'Request-Promise'
+	    	},
+	    	json: true
+			};
+
+		rqst(options)
+		    .then(function (data) {
+				user.followings = data.data
+				user.save(function(err){
+				  if(err){
+					  var err = 'An error occurred when trying to save user to DB at getFollowings';
+					  console.log(err);
+				  }else {
+					  console.log('User ' + user.username + ' successfuly updated its followings.');
+				  }
+				})
+				res.send(data.data);
+		    })
+		    .catch(function (err) {
+		        console.log('An error ocurred when requesting the followings');
+		    });
+		}else{
+			res.send(user.followings);
+		}
+	});
+};
+
+
+exports.getNotRelated = function(req, res) {
+	User.findOne({ cod: req.session.cod }, function(err, user) {
+		if (user) {
+			res.locals.user = user;
+		}else {
+			res.redirect('/login');
+		}
+		if(user.notRelated == null) {
+            var notFollowing = [];
+            var notFollower = [];
+            notFollowing = _.differenceWith(user.followers, user.followings, _.isEqual);
+			notFollower = _.differenceWith(user.followings, user.followers, _.isEqual);
+			user.notRelated = {
+				notFollowings: notFollowing,
+				notFollowers: notFollower
+			}
+            console.log(user.notRelated.notFollowers);
+			user.save(function(err){
+			  if(err){
+				  var err = 'An error occurred when trying to save user to DB at getFollowings';
+				  console.log(err);
+			  }else {
+				  console.log('User ' + user.username + ' successfuly updated its notRelated.');
+			  }
+			})
+			res.send(user.notRelated);
+
+		}else {
+			res.send(user.notRelated);
+		}
+	});
+};
+
+exports.getMedias = function(req, res) {
+	if(req.session.user.medias == null){
 		var options = {
-    	uri: 'https://api.instagram.com/v1/users/self/follows',
+    	uri: 'https://api.instagram.com/v1/users/self/media/recent/',
     	qs: {
-        	access_token: api.access_token
+        	access_token: req.session.at
     	},
     	headers: {
         	'User-Agent': 'Request-Promise'
@@ -107,83 +265,91 @@ exports.getFollowings = function(req, res) {
 
 		rqst(options)
 		    .then(function (data) {
-				user.followings = data.data;
-				res.send(user.followings);
+				req.session.user.medias = data.data;
+				//console.log('medias'. req.session.user.medias);
+				res.send(data.data);
 		    })
 		    .catch(function (err) {
-		        console.log('An error ocurred when requesting the followings');
+		        console.log('An error ocurred when requesting the medias', err);
 		    });
 
 	}else{
-		res.send(user.followings);
+		res.send(req.session.user.medias);
 	}
 };
 
-exports.getNotFollowings = function(req, res) {
-	user.notFollowings = _.differenceWith(user.followers, user.followings, _.isEqual);
-	res.send(user.notFollowings);
-};
+exports.getMedias = function (req, res) {
+	User.findOne({ cod: req.session.cod }, function(err, user) {
+		if (user) {
+			res.locals.user = user;
+		}else {
+			res.redirect('/login');
+		}
+		if (user.medias == null){
+			var options = {
+		    	uri: 'https://api.instagram.com/v1/users/self/media/recent/',
+		    	qs: {
+		        	access_token: user.token
+		    	},
+		    	headers: {
+		        	'User-Agent': 'Request-Promise'
+		    	},
+		    	json: true
+				};
 
-exports.getNotFollowers = function(req, res) {
-	user.notFollowers = _.differenceWith(user.followings, user.followers, _.isEqual);
-	res.send(user.notFollowers);
-};
-
-exports.getMedias = function(req, res) {
-	if (user.medias == null) {
-		ig.user_media_recent(user.id.toString(), function(err, medias, pagination, remaining, limit) {
-			if (err) {
-			  console.log('An error occurred when trying to get the medias.\nCod: ' + err.code + '\nInstagram message: ' + err.error_message);
-			} else {
-			  console.log('Medias were successfuly requested.');
-			  user.medias = medias;
-			  res.send(medias);
-			}
-		});
-	}else{
-		res.send(user.medias);
-	}
-};
-
-exports.getTags = function(req, res) {
-	if (user.tags == null) {
-		var tags = []; //all tags
-		var dicTags = [];
-
-		_.forEach(user.medias, function(media) {
-			_.forEach(media.tags, function(tag) {
-				tags.push(tag);
-			});
-		});
-
-		tags = _.countBy(tags);
-
-		_.forEach(tags, function(value, key) {
-			dicTags.push({
-    			name: key,
-    			freq: value
-			});
-		});
-
-		dicTags = _.orderBy(dicTags, 'freq', 'desc');
-
-		user.tags = _.slice(dicTags, 0, 10);
-
-		res.send(user.tags);
-	}else{
-		res.send(user.tags);
-	}
+			rqst(options)
+			    .then(function (data) {
+					user.medias = data.data;
+					user.save(function(err){
+		  			  if(err){
+		  				  var err = 'An error occurred when trying to save user to DB at getMedias';
+		  				  console.log(err);
+		  			  }else {
+                          console.log('User ' + user.username + ' successfuly updated its medias.');
+		  			  }
+                  });
+					res.send(user.medias);
+			    })
+			    .catch(function (err) {
+                    console.log('An error ocurred when requesting the medias', err);
+			    });
+		}else{
+			res.send(user.medias);
+		}
+	});
 };
 
 exports.getStats = function(req, res) {
+	var tags = []; //all tags
+	var dicTags = [];
 	var totalLikes = 0;
 	var location = [];
 	var dicLocal = [];
 	var tagged = [];
 	var dicTagged = [];
 
+	//tags
+	_.forEach(req.session.user.medias, function(media) {
+		_.forEach(media.tags, function(tag) {
+			tags.push(tag);
+		});
+	});
+
+	tags = _.countBy(tags);
+
+	_.forEach(tags, function(value, key) {
+		dicTags.push({
+			name: key,
+			freq: value
+		});
+	});
+
+	dicTags = _.orderBy(dicTags, 'freq', 'desc');
+
+	dicTags = _.slice(dicTags, 0, 10);
+
 	//location and total of likes
-	_.forEach(user.medias, function(media) {
+	_.forEach(req.session.user.medias, function(media) {
 		totalLikes += media.likes.count;
 		if(media.location != null)
 			location.push(media.location.name);
@@ -203,7 +369,7 @@ exports.getStats = function(req, res) {
 
 
 	//user tagged in the photos
-	_.forEach(user.medias, function(line) {
+	_.forEach(req.session.user.medias, function(line) {
 		_.forEach(line.users_in_photo, function(u) {
 			tagged.push(u.user.username);
 		});
@@ -223,19 +389,31 @@ exports.getStats = function(req, res) {
 	dicTagged = _.slice(dicTagged, 0, 10);
 
 	var stats = {
+		words: dicTags,
 		totalLikes: totalLikes,
 		places: dicLocal,
 		tagged_users: dicTagged
 	};
-
+	console.log(req.session.user);
 	res.send(stats);
-}
+};
+
+exports.finalize = function(req, res) {
+	User.findOne({ cod: req.session.cod }, function(err, user) {
+		if (user) {
+			User.deleteOne({ cod: req.session.cod }, function (err) {
+				if(err)
+					console.log('User ',req.session.cod, ' could not be deleted at the end of application', err);
+			});
+		}
+	});
+	console.log('End of the session.');
+	res.redirect('/');
+};
 
 //------------------------ ROUTES --------------------------
 
-app.get('/', function(req, res) {
-	res.send('Go to /login');
-});
+app.get('/end', exports.finalize);
 
 // Authorization url
 app.get('/login', exports.authorize_user);
@@ -246,10 +424,8 @@ app.get('/callback/', exports.handleauth);
 app.get('/data/user', exports.getBasicInfo);
 app.get('/data/followers', exports.getFollowers);
 app.get('/data/followings', exports.getFollowings);
-app.get('/data/notfollowings', exports.getNotFollowings);
-app.get('/data/notfollowers', exports.getNotFollowers);
+app.get('/data/notrelated', exports.getNotRelated);
 app.get('/data/medias', exports.getMedias);
-app.get('/data/tags', exports.getTags);
 app.get('/data/stats', exports.getStats);
 
 

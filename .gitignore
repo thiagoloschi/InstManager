@@ -38,3 +38,5 @@ jspm_packages
 
 models/api.js
 
+#Enviroment variables
+.env

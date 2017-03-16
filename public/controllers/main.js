@@ -6,7 +6,8 @@ instApp.controller('mainController', ['$scope', '$http', '$location', '$routePar
 
 	$scope.getUser = function(){
 		$http.get('/data/user').then(function(response) {
-			$scope.user = response.data;
+			$scope.user = response.data[0];
+			console.log($scope.user);
 		})
 	}
 
