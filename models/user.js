@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-//Student Schema
+//User Schema
 var userSchema = mongoose.Schema({
     cod: Number,
     username: String,

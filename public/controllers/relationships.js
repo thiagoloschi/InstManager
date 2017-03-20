@@ -6,7 +6,7 @@ instApp.controller('relationshipsController', ['$scope', '$http', '$location', '
 
     $scope.getUser = function(){
         $http.get('/data/user').then(function(response) {
-            $scope.user = response.data;
+            $scope.user = response.data[0];
         })
     }
 

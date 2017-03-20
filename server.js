@@ -21,7 +21,8 @@ var ig = require('instagram-node').instagram();
 //Initiates the express application
 var app = express();
 
-//Connects to mongodb
+//Connects to mongodb using Bluebird for promises
+mongoose.Promise = require('bluebird');
 mongoose.connect('mongodb://localhost/instmanager');
 
 //Middlewares
@@ -56,7 +57,7 @@ exports.handleauth = function(req, res) {
 		  console.log(err.body);
 		  res.send("An error occurred when trying to authorize user.");
 		} else {
-		  console.log('Access token successfuly aquired');
+		  console.log('Access token successfully aquired');
 		  req.session.cod = result.user.id;
 		  req.session.name = result.user.username;
 		  User.findOne({ cod: req.session.cod }, function(err, user) {
@@ -80,7 +81,7 @@ exports.handleauth = function(req, res) {
 					 var err = 'An error occurred when trying to save user to DB';
 					 console.log(err);
 				 }else {
-				   console.log('User ' + user.username + ' was successfuly saved to DB.');
+				   console.log('User ' + user.username + ' was successfully saved to DB.');
 				 }
 
 			 })
@@ -101,6 +102,7 @@ exports.getBasicInfo = function (req, res) {
 			res.redirect('/login');
 		}
 		if (user.basicInfo == null){
+            var info;
 			var options = {
 		    	uri: 'https://api.instagram.com/v1/users/self/',
 		    	qs: {
@@ -114,21 +116,21 @@ exports.getBasicInfo = function (req, res) {
 
 			rqst(options)
 			    .then(function (data) {
-					user.basicInfo = data.data;
-					user.save(function(err){
-		  			  if(err){
-		  				  var err = 'An error occurred when trying to save user to DB';
-		  				  console.log(err);
-		  			  }else {
-		  			  	console.log('User ' + user.username + ' successfuly updated basicInfo.');
-		  			  }
-		  		  	})
-					res.send(user.basicInfo);
+                    User.update({ cod: req.session.cod }, { basicInfo: data.data }, options, function(err){
+                        if(err){
+                          var err = 'An error occurred when trying to save user to DB';
+                          console.log( err);
+                        }else {
+
+                            console.log('User ' + user.username + ' successfully updated basicInfo.');
+                        }
+                    });
+					res.send([data.data]);
 			    })
 			    .catch(function (err) {
 			        console.log('An error ocurred when requesting the basics', err);
 			    });
-		}else{
+        }else{
 			res.send(user.basicInfo);
 		}
 	});
@@ -153,26 +155,25 @@ exports.getFollowers = function (req, res) {
 	    	json: true
 			};
 
-		rqst(options)
-		    .then(function (data) {
-				user.followers = data.data, 1;
-				user.save(function(err){
-				  if(err){
-					  var err = 'An error occurred when trying to save user to DB at getFollowers';
-					  console.log(err);
-				  }else {
-					  console.log('User ' + user.username + ' successfuly updated its followers.');
-				  }
-				})
-				res.send(data.data);
-		    })
-		    .catch(function (err) {
-		        console.log('An error ocurred when requesting the followers');
-		    });
-		}else{
-			res.send(user.followers);
-		}
-	});
+    		rqst(options)
+            .then(function (data) {
+                User.update({ cod: req.session.cod }, { followers: data.data }, options, function(err){
+                    if(err){
+                      var err = 'An error occurred when trying to save users followers';
+                      console.log( err);
+                    }else {
+                        console.log('User ' + user.username + ' successfully updated followers.');
+                    }
+                });
+                res.send(data.data);
+            })
+            .catch(function (err) {
+                console.log('An error ocurred when requesting the followers');
+            });
+        }else{
+            res.send(user.followers);
+        }
+    });
 };
 
 exports.getFollowings = function (req, res) {
@@ -194,26 +195,25 @@ exports.getFollowings = function (req, res) {
 	    	json: true
 			};
 
-		rqst(options)
-		    .then(function (data) {
-				user.followings = data.data
-				user.save(function(err){
-				  if(err){
-					  var err = 'An error occurred when trying to save user to DB at getFollowings';
-					  console.log(err);
-				  }else {
-					  console.log('User ' + user.username + ' successfuly updated its followings.');
-				  }
-				})
-				res.send(data.data);
-		    })
-		    .catch(function (err) {
-		        console.log('An error ocurred when requesting the followings');
-		    });
-		}else{
-			res.send(user.followings);
-		}
-	});
+            rqst(options)
+            .then(function (data) {
+                User.update({ cod: req.session.cod }, { followings: data.data }, options, function(err){
+                    if(err){
+                      var err = 'An error occurred when trying to save users followings';
+                      console.log( err);
+                    }else {
+                        console.log('User ' + user.username + ' successfully updated followings.');
+                    }
+                });
+                res.send(data.data);
+            })
+            .catch(function (err) {
+                console.log('An error ocurred when requesting the followings');
+            });
+        }else{
+            res.send(user.followings);
+        }
+    });
 };
 
 
@@ -224,58 +224,25 @@ exports.getNotRelated = function(req, res) {
 		}else {
 			res.redirect('/login');
 		}
-		if(user.notRelated == null) {
-            var notFollowing = [];
-            var notFollower = [];
-            notFollowing = _.differenceWith(user.followers, user.followings, _.isEqual);
-			notFollower = _.differenceWith(user.followings, user.followers, _.isEqual);
-			user.notRelated = {
-				notFollowings: notFollowing,
-				notFollowers: notFollower
-			}
-            console.log(user.notRelated.notFollowers);
-			user.save(function(err){
-			  if(err){
-				  var err = 'An error occurred when trying to save user to DB at getFollowings';
-				  console.log(err);
-			  }else {
-				  console.log('User ' + user.username + ' successfuly updated its notRelated.');
-			  }
-			})
-			res.send(user.notRelated);
 
-		}else {
-			res.send(user.notRelated);
+        var notFollowing = [];
+        var notFollower = [];
+        notFollowing = _.differenceWith(user.followers, user.followings, _.isEqual);
+		notFollower = _.differenceWith(user.followings, user.followers, _.isEqual);
+		user.notRelated = {
+			notFollowings: notFollowing,
+			notFollowers: notFollower
 		}
+		res.send(user.notRelated);
+        user.save(function(err){
+          if(err){
+              var err = 'An error occurred when trying to save user to DB at getFollowings';
+              console.log(err);
+          }else {
+              console.log('User ' + user.username + ' successfully updated its notRelated.');
+          }
+        })
 	});
-};
-
-exports.getMedias = function(req, res) {
-	if(req.session.user.medias == null){
-		var options = {
-    	uri: 'https://api.instagram.com/v1/users/self/media/recent/',
-    	qs: {
-        	access_token: req.session.at
-    	},
-    	headers: {
-        	'User-Agent': 'Request-Promise'
-    	},
-    	json: true
-		};
-
-		rqst(options)
-		    .then(function (data) {
-				req.session.user.medias = data.data;
-				//console.log('medias'. req.session.user.medias);
-				res.send(data.data);
-		    })
-		    .catch(function (err) {
-		        console.log('An error ocurred when requesting the medias', err);
-		    });
-
-	}else{
-		res.send(req.session.user.medias);
-	}
 };
 
 exports.getMedias = function (req, res) {
@@ -295,107 +262,113 @@ exports.getMedias = function (req, res) {
 		        	'User-Agent': 'Request-Promise'
 		    	},
 		    	json: true
-				};
+			};
 
-			rqst(options)
-			    .then(function (data) {
-					user.medias = data.data;
-					user.save(function(err){
-		  			  if(err){
-		  				  var err = 'An error occurred when trying to save user to DB at getMedias';
-		  				  console.log(err);
-		  			  }else {
-                          console.log('User ' + user.username + ' successfuly updated its medias.');
-		  			  }
-                  });
-					res.send(user.medias);
-			    })
-			    .catch(function (err) {
-                    console.log('An error ocurred when requesting the medias', err);
-			    });
-		}else{
-			res.send(user.medias);
-		}
-	});
+            rqst(options)
+            .then(function (data) {
+                User.update({ cod: req.session.cod }, { medias: data.data }, options, function(err){
+                    if(err){
+                      var err = 'An error occurred when trying to save users medias';
+                      console.log( err);
+                    }else {
+                        console.log('User ' + user.username + ' successfully updated medias.');
+                    }
+                });
+                res.send(data.data);
+            })
+            .catch(function (err) {
+                console.log('An error ocurred when requesting the medias');
+            });
+        }else{
+            res.send(user.medias);
+        }
+    });
 };
 
 exports.getStats = function(req, res) {
-	var tags = []; //all tags
-	var dicTags = [];
-	var totalLikes = 0;
-	var location = [];
-	var dicLocal = [];
-	var tagged = [];
-	var dicTagged = [];
+    User.findOne({ cod: req.session.cod }, function(err, user) {
+		if (user) {
+			res.locals.user = user;
+		}else {
+			res.redirect('/login');
+		}
 
-	//tags
-	_.forEach(req.session.user.medias, function(media) {
-		_.forEach(media.tags, function(tag) {
-			tags.push(tag);
-		});
-	});
+        var tags = []; //all tags
+    	var dicTags = [];
+    	var totalLikes = 0;
+    	var location = [];
+    	var dicLocal = [];
+    	var tagged = [];
+    	var dicTagged = [];
 
-	tags = _.countBy(tags);
+    	//tags
+    	_.forEach(user.medias, function(media) {
+    		_.forEach(media.tags, function(tag) {
+    			tags.push(tag);
+    		});
+    	});
 
-	_.forEach(tags, function(value, key) {
-		dicTags.push({
-			name: key,
-			freq: value
-		});
-	});
+    	tags = _.countBy(tags);
 
-	dicTags = _.orderBy(dicTags, 'freq', 'desc');
+    	_.forEach(tags, function(value, key) {
+    		dicTags.push({
+    			name: key,
+    			freq: value
+    		});
+    	});
 
-	dicTags = _.slice(dicTags, 0, 10);
+    	dicTags = _.orderBy(dicTags, 'freq', 'desc');
 
-	//location and total of likes
-	_.forEach(req.session.user.medias, function(media) {
-		totalLikes += media.likes.count;
-		if(media.location != null)
-			location.push(media.location.name);
-	});
+    	dicTags = _.slice(dicTags, 0, 10);
 
-	location = _.countBy(location);
+    	//location and total of likes
+    	_.forEach(user.medias, function(media) {
+    		totalLikes += media.likes.count;
+    		if(media.location != null)
+    			location.push(media.location.name);
+    	});
 
-	_.forEach(location, function(value, key) {
-		dicLocal.push({
-			name: key,
-			freq: value
-		});
-	});
+    	location = _.countBy(location);
 
-	dicLocal = _.orderBy(dicLocal, 'freq', 'desc');
-	dicLocal = _.slice(dicLocal, 0, 10);
+    	_.forEach(location, function(value, key) {
+    		dicLocal.push({
+    			name: key,
+    			freq: value
+    		});
+    	});
 
-
-	//user tagged in the photos
-	_.forEach(req.session.user.medias, function(line) {
-		_.forEach(line.users_in_photo, function(u) {
-			tagged.push(u.user.username);
-		});
-	});
-
-	tagged = _.countBy(tagged);
+    	dicLocal = _.orderBy(dicLocal, 'freq', 'desc');
+    	dicLocal = _.slice(dicLocal, 0, 10);
 
 
-	_.forEach(tagged, function(value, key) {
-		dicTagged.push({
-			username: key,
-			freq: value
-		});
-	});
+    	//user tagged in the photos
+    	_.forEach(user.medias, function(line) {
+    		_.forEach(line.users_in_photo, function(u) {
+    			tagged.push(u.user.username);
+    		});
+    	});
 
-	dicTagged = _.orderBy(dicTagged, 'freq', 'desc');
-	dicTagged = _.slice(dicTagged, 0, 10);
+    	tagged = _.countBy(tagged);
 
-	var stats = {
-		words: dicTags,
-		totalLikes: totalLikes,
-		places: dicLocal,
-		tagged_users: dicTagged
-	};
-	console.log(req.session.user);
-	res.send(stats);
+
+    	_.forEach(tagged, function(value, key) {
+    		dicTagged.push({
+    			username: key,
+    			freq: value
+    		});
+    	});
+
+    	dicTagged = _.orderBy(dicTagged, 'freq', 'desc');
+    	dicTagged = _.slice(dicTagged, 0, 10);
+
+    	var stats = {
+    		words: dicTags,
+    		totalLikes: totalLikes,
+    		places: dicLocal,
+    		tagged_users: dicTagged
+    	};
+    	res.send(stats);
+    });
 };
 
 exports.finalize = function(req, res) {
