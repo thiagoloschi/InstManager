@@ -32,7 +32,7 @@ app.use(bodyParser.json());
 //Sets the client cookie and creates a session
 app.use(session({
   cookieName: 'session',
-  //this will become an enviroment variable with the proper secret
+  //this will become an environment variable with the proper secret
   secret: 'issoVAIvirarENVvar',
   duration: 30 * 60 * 1000,
   activeDuration: 5 * 60 * 1000,
@@ -157,7 +157,7 @@ exports.getFollowers = function (req, res) {
 
     		rqst(options)
             .then(function (data) {
-                User.update({ cod: req.session.cod }, { followers: data.data }, options, function(err){
+                User.update({ cod: req.session.cod }, { followers: _.drop(data.data,1) }, options, function(err){
                     if(err){
                       var err = 'An error occurred when trying to save users followers';
                       console.log( err);
@@ -165,7 +165,7 @@ exports.getFollowers = function (req, res) {
                         console.log('User ' + user.username + ' successfully updated followers.');
                     }
                 });
-                res.send(data.data);
+                res.send(_.drop(data.data,1));
             })
             .catch(function (err) {
                 console.log('An error ocurred when requesting the followers');
@@ -197,7 +197,7 @@ exports.getFollowings = function (req, res) {
 
             rqst(options)
             .then(function (data) {
-                User.update({ cod: req.session.cod }, { followings: data.data }, options, function(err){
+                User.update({ cod: req.session.cod }, { followings: _.dropRight(data.data,1) }, options, function(err){
                     if(err){
                       var err = 'An error occurred when trying to save users followings';
                       console.log( err);
@@ -205,7 +205,7 @@ exports.getFollowings = function (req, res) {
                         console.log('User ' + user.username + ' successfully updated followings.');
                     }
                 });
-                res.send(data.data);
+                res.send(_.dropRight(data.data,1));
             })
             .catch(function (err) {
                 console.log('An error ocurred when requesting the followings');
@@ -238,8 +238,6 @@ exports.getNotRelated = function(req, res) {
           if(err){
               var err = 'An error occurred when trying to save user to DB at getFollowings';
               console.log(err);
-          }else {
-              console.log('User ' + user.username + ' successfully updated its notRelated.');
           }
         })
 	});
@@ -376,11 +374,11 @@ exports.finalize = function(req, res) {
 		if (user) {
 			User.deleteOne({ cod: req.session.cod }, function (err) {
 				if(err)
-					console.log('User ',req.session.cod, ' could not be deleted at the end of application', err);
+					console.log('User ',req.session.username, ' could not be deleted at the end of application', err);
 			});
 		}
 	});
-	console.log('End of the session.');
+	console.log('End of session for %s.', req.session.username);
 	res.redirect('/');
 };
 

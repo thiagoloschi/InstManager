@@ -67,11 +67,59 @@ hr{
 /* RELATIONSHIPS */
 
 .thumb-sm {
-    height: 32px;
-    width: 32px;
+    height: 50px;
+    width: 50px;
 }
 .thumb-sm img {
     height: auto;
     max-width: 100%;
     vertical-align: middle;
+}
+
+.media-body{
+	vertical-align: middle;
+}
+
+.acting{
+	text-align: center;
+	vertical-align: middle;
+	padding: 16px;
+}
+
+.follow-button{
+	font-size: 10px;
+	font-weight: bold;
+	border-radius: 0.25rem;
+	line-height: 1;
+}
+
+.follow-button:hover{
+	text-decoration: none;
+	/*color: #1F2D3D;
+	background-color: #FFBC42;
+*/
+}
+
+.follow-green{
+	color: white;
+	border-color: #49DCB1;
+	background-color: #25C47C;
+	padding: 4px 12px;
+}
+
+.follow-green:hover{
+	background-color: #27DD76;
+	color: white;
+}
+
+.follow-red{
+	color: white;
+	border-color: #D10437;
+	background-color: #D8315B;
+	padding: 4px 6px;
+}
+
+.follow-red:hover{
+	background-color: #FF3F6F;
+	color: white;
 }

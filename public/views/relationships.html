@@ -30,24 +30,24 @@
 	                <li class="list-group-item" ng-repeat="follower in followers">
 
 						<div class="card-line row">
-							<div class="col-sm-9">
+							<div class="col-sm-12">
 								<div class="media">
 								  <div class="media-left">
 								      <img src="{{follower.profile_picture}}" class="media-object thumb-sm br-radius">
 								  </div>
 								  <div class="media-body">
-								    <a href="#">{{follower.username}}</a>
+								    <a href="">{{follower.username}}</a>
 								  </div>
 								</div>
-							</div>
-							<div class="col-sm-3">
-								<span class="pull-right label bg-primary inline m-t-10">Following</span>
 							</div>
 						</div>
 					</li>
 	            </ul>
 		    </div>
 		</div>
+
+
+
 
 
 		<div class="col-md-3 col-sm-6">
@@ -61,18 +61,15 @@
 				<ul class="list-group list-group-lg">
 					<li class="list-group-item" ng-repeat="following in followings">
 						<div class="card-line row">
-							<div class="col-sm-9">
+							<div class="col-sm-12">
 								<div class="media">
 								  <div class="media-left">
 									  <img src="{{following.profile_picture}}" class="media-object thumb-sm br-radius">
 								  </div>
 								  <div class="media-body">
-									<a href="#">{{following.username}}</a>
+									<a href="">{{following.username}}</a>
 								  </div>
 								</div>
-							</div>
-							<div class="col-sm-3">
-								<span class="pull-right label bg-primary inline m-t-10">Following</span>
 							</div>
 						</div>
 					</li>
@@ -97,18 +94,41 @@
 									  <img src="{{follow.profile_picture}}" class="media-object thumb-sm br-radius">
 								  </div>
 								  <div class="media-body">
-									<a href="#">{{follow.username}}</a>
+									<a href="">{{follow.username}}</a>
 								  </div>
 								</div>
 							</div>
-							<div class="col-sm-3">
-								<span class="pull-right label bg-primary inline m-t-10">Following</span>
+							<div class="acting col-sm-3">
+								<a data-toggle="modal" data-target="#myModal" role="button" class="follow-button follow-green pull-right">Follow</a>
 							</div>
 						</div>
 					</li>
 				</ul>
 			</div>
 		</div>
+
+		<!-- Modal -->
+	     <div class="modal fade" id="myModal" role="dialog">
+	       <div class="modal-dialog">
+
+	         <!-- Modal content-->
+	         <div class="modal-content">
+	           <div class="modal-header">
+	             <button type="button" class="close" data-dismiss="modal">&times;</button>
+	             <h4 class="modal-title">Confirm action</h4>
+	           </div>
+	           <div class="modal-body">
+	             <p>Are you sure?</p>
+	           </div>
+
+	           <div class="modal-footer">
+	             <button type="button" class="btn btn-success" data-dismiss="modal">Yes</button>
+	             <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+	           </div>
+	         </div>
+
+	       </div>
+	     </div>
 
 
 		<div class="col-md-3 col-sm-6">
@@ -128,12 +148,12 @@
 									  <img src="{{foll.profile_picture}}" class="media-object thumb-sm br-radius">
 								  </div>
 								  <div class="media-body">
-									<a href="#">{{foll.username}}</a>
+									<a href="">{{foll.username}}</a>
 								  </div>
 								</div>
 							</div>
-							<div class="col-sm-3">
-								<span class="pull-right label bg-primary inline m-t-10">Following</span>
+							<div class="acting col-sm-3">
+								<a data-toggle="modal" data-target="#myModal" role="button" class="follow-button follow-red pull-right">Unfollow</a>
 							</div>
 						</div>
 					</li>
@@ -141,9 +161,5 @@
 			</div>
 		</div>
 
-	</div>
-
-
-
-
+		</div>
 </div>
