@@ -1,21 +1,20 @@
 <div class="container main" ng-init="getUser()">
 
 	<div class="nav">
-		<div class="navbar-header">
+		<div class="navbar-header col-md-5 col-sm-12">
 		  <span id="fst" class="navbar-brand">Hi <strong>{{user.username}}</strong>, what would you like to do?</span>
 		</div>
-		<div id="navbar" class="navbar-collapse collapse">
+		<div id="navbar" class="navbar col-md-7 col-sm-12">
 		  <ul class="nav navbar-nav">
-            <li><a href="#!/main">See My Profile</a></li>
+			<li><a href="#!/main">See My Profile</a></li>
 			<li><a href="#!/relationships">Manage My Relationships</a></li>
-			<li><a href="/">Logout</a></li>
+			<li class='active'><a href="#!/stats">See My Statistics</a></li>
+			<li><a href="/end">Logout</a></li>
 		  </ul>
 		</div>
 	</div>
 
 	<hr>
-
-	<br><br>
 
 	<div class="row">
 		<div class="card col-md-4">
@@ -42,7 +41,7 @@
 			</div>
 		</div>
 
-		<div class="card col-md-4">
+		<div class="card col-md-4 col-sm-12">
 			<div class="card-header">
 				<h4>
 					Top<strong> 10 </strong>
@@ -54,10 +53,10 @@
 					<li class="list-group-item" ng-repeat="tag in tags">
 
 						<div class="card-line row">
-							<div class="col-sm-6">
+							<div class="col-sm-9">
 								<a href="#">#{{tag.name}}</a>
 							</div>
-							<div class="col-sm-6">
+							<div class="col-sm-3">
 								<strong>{{tag.freq}}</strong>x
 							</div>
 						</div>

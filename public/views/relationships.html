@@ -1,14 +1,15 @@
-<div class="container main" ng-init="getUser()">
+<div class="container main" ng-init="getUser(); getRelated();">
 
 	<div class="nav">
-		<div class="navbar-header">
+		<div class="navbar-header col-md-5 col-sm-12">
 		  <span id="fst" class="navbar-brand">Hi <strong>{{user.username}}</strong>, what would you like to do?</span>
 		</div>
-		<div id="navbar" class="navbar-collapse collapse">
+		<div id="navbar" class="navbar col-md-7 col-sm-12">
 		  <ul class="nav navbar-nav">
-            <li><a href="#!/main">See My Profile</a></li>
+			<li><a href="#!/main">See My Profile</a></li>
+			<li class='active'><a href="#!/relationships">Manage My Relationships</a></li>
 			<li><a href="#!/stats">See My Statistics</a></li>
-			<li><a href="/">Logout</a></li>
+			<li><a href="/end">Logout</a></li>
 		  </ul>
 		</div>
 	</div>
@@ -18,25 +19,25 @@
 	<br><br>
 
 	<div class="row">
-		<div class="card col-md-3 col-sm-6">
+		<div class="col-md-3 col-sm-6">
 		    <div class="card-header">
 		        <h4>
 					<strong>{{user.counts.followed_by}}</strong>
 					Followers
 		        </h4>
 		    </div>
-		    <div ng-init="getFollowers()" class="card-body">
+		    <div class="card-body">
 	            <ul class="list-group list-group-lg">
-	                <li class="list-group-item" ng-repeat="follower in followers">
+	                <li class="list-group-item" ng-repeat="person in followers">
 
 						<div class="card-line row">
 							<div class="col-sm-12">
 								<div class="media">
 								  <div class="media-left">
-								      <img src="{{follower.profile_picture}}" class="media-object thumb-sm br-radius">
+								      <img src="{{person.profile_picture}}" class="media-object thumb-sm br-radius">
 								  </div>
 								  <div class="media-body">
-								    <a href="">{{follower.username}}</a>
+								    <a href="">{{person.username}}</a>
 								  </div>
 								</div>
 							</div>
@@ -57,19 +58,22 @@
 					Followings
 				</h4>
 			</div>
-			<div ng-init="getFollowings()" class="card-body">
+			<div class="card-body">
 				<ul class="list-group list-group-lg">
-					<li class="list-group-item" ng-repeat="following in followings">
+					<li class="list-group-item" ng-repeat="person in followings">
 						<div class="card-line row">
-							<div class="col-sm-12">
+							<div class="col-sm-9">
 								<div class="media">
 								  <div class="media-left">
-									  <img src="{{following.profile_picture}}" class="media-object thumb-sm br-radius">
+									  <img src="{{person.profile_picture}}" class="media-object thumb-sm br-radius">
 								  </div>
 								  <div class="media-body">
-									<a href="">{{following.username}}</a>
+									<a href="">{{person.username}}</a>
 								  </div>
 								</div>
+							</div>
+							<div class="acting col-sm-3">
+								<a id="{{person.id}}" data-target="" ng-click="unfollow()" role="button"  class="follow-button follow-red pull-right" name="unfollow">Unfollow</a>
 							</div>
 						</div>
 					</li>
@@ -84,51 +88,28 @@
 				 		You Don't Follow Back
 				</h4>
 			</div>
-			<div ng-init="getNotFollowings()" class="card-body">
+			<div class="card-body">
 				<ul class="list-group list-group-lg">
-					<li class="list-group-item" ng-repeat="follow in notFollowings">
+					<li class="list-group-item" ng-repeat="person in notFollowings">
 						<div class="card-line row">
 							<div class="col-sm-9">
 								<div class="media">
 								  <div class="media-left">
-									  <img src="{{follow.profile_picture}}" class="media-object thumb-sm br-radius">
+									  <img src="{{person.profile_picture}}" class="media-object thumb-sm br-radius">
 								  </div>
 								  <div class="media-body">
-									<a href="">{{follow.username}}</a>
+									<a href="http://instagram.com/{{person.username}}" target="_blank">{{person.username}}</a>
 								  </div>
 								</div>
 							</div>
 							<div class="acting col-sm-3">
-								<a data-toggle="modal" data-target="#myModal" role="button" class="follow-button follow-green pull-right">Follow</a>
+								<a id="{{person.id}}" ng-click="follow()" role="button" class="follow-button follow-green pull-right" name="follow" value="">Follow</a>
 							</div>
 						</div>
 					</li>
 				</ul>
 			</div>
 		</div>
-
-		<!-- Modal -->
-	     <div class="modal fade" id="myModal" role="dialog">
-	       <div class="modal-dialog">
-
-	         <!-- Modal content-->
-	         <div class="modal-content">
-	           <div class="modal-header">
-	             <button type="button" class="close" data-dismiss="modal">&times;</button>
-	             <h4 class="modal-title">Confirm action</h4>
-	           </div>
-	           <div class="modal-body">
-	             <p>Are you sure?</p>
-	           </div>
-
-	           <div class="modal-footer">
-	             <button type="button" class="btn btn-success" data-dismiss="modal">Yes</button>
-	             <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
-	           </div>
-	         </div>
-
-	       </div>
-	     </div>
 
 
 		<div class="col-md-3 col-sm-6">
@@ -138,22 +119,22 @@
 						Don't Follow You Back
 				</h4>
 			</div>
-			<div ng-init="getNotFollowers()" class="card-body">
+			<div class="card-body">
 				<ul class="list-group list-group-lg">
-					<li class="list-group-item" ng-repeat="foll in notFollowers">
+					<li class="list-group-item" ng-repeat="person in notFollowers">
 						<div class="card-line row">
 							<div class="col-sm-9">
 								<div class="media">
 								  <div class="media-left">
-									  <img src="{{foll.profile_picture}}" class="media-object thumb-sm br-radius">
+									  <img src="{{person.profile_picture}}" class="media-object thumb-sm br-radius">
 								  </div>
 								  <div class="media-body">
-									<a href="">{{foll.username}}</a>
+									<a href="">{{person.username}}</a>
 								  </div>
 								</div>
 							</div>
 							<div class="acting col-sm-3">
-								<a data-toggle="modal" data-target="#myModal" role="button" class="follow-button follow-red pull-right">Unfollow</a>
+								<a id="{{person.id}}" data-target="" ng-click="unfollow()" role="button"  class="follow-button follow-red pull-right" name="unfollow">Unfollow</a>
 							</div>
 						</div>
 					</li>
@@ -162,4 +143,34 @@
 		</div>
 
 		</div>
+
+		<!-- Modal -->
+		 <div class="modal fade" id="myModal" role="dialog">
+		   <div class="modal-dialog">
+
+			 <!-- Modal content-->
+			 <div class="modal-content">
+			   <div class="modal-header">
+				 <button type="button" class="close" data-dismiss="modal">&times;</button>
+				 <h4 class="modal-title">Confirm action</h4>
+			   </div>
+			   <div class="modal-body">
+				   <p>Are you sure?</p>
+				   <div name="userId" id="userId"></div>
+			   </div>
+
+			   <div class="modal-footer">
+				 <a href="/changeRel/"></a>
+				 <button type="button" class="btn btn-success" data-dismiss="modal">Yes</button>
+				 <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+			   </div>
+			 </div>
+
+		   </div>
+		 </div>
+		 <h5>Changes may take some time to take effect. Users with private profile need to accept your follow requests.</h5>
+
+		<script type="text/javascript">
+
+		</script>
 </div>

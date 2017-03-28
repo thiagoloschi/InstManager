@@ -2,7 +2,85 @@
 	padding: 0;
 	margin: 0;
 }
+
+/* Tags */
+
+body{
+	height: 100%;
+}
+
+hr{
+	border-bottom-color: black;
+}
+
+a:hover{
+	text-decoration: none;
+	role: none;
+}
+
+/* Login */
+
+.login{
+	margin: -20% 0 0 0;
+	padding: 20% 0 20% 0;
+	height: 100%;
+	width: 100%;
+	font-size: 18px;
+}
+
+.lgnbutton{
+	margin-bottom: 40px;
+	border: solid 1px white;
+	width: 200px;
+	padding: 14px 18px;
+	color: linear-gradient(to right, rgba(153,47,255,1) 0%, rgba(240, 84, 79,1) 100%);
+	background-color: rgba(255,255,255,1);
+	border-radius: 0.25rem;
+	font-weight: bold;
+	box-shadow: 12px 15px 20px 0px rgba(46, 61, 73, 0.15);
+}
+
+.lgnbutton:hover{
+	text-decoration: none;
+		background: -webkit-gradient(left top, right top, color-stop(0%, rgba(240, 84, 79,1)), color-stop(100%, rgba(39,139,255,1)));
+		background: -webkit-linear-gradient(left, rgba(153,47,255,1) 0%, rgba(240, 84, 79,1) 100%);
+		background: linear-gradient(to right, rgba(153,47,255,1) 0%, rgba(240, 84, 79,1) 100%);
+		color: white;
+}
+
+.port{
+	height: 300px;
+	width: 420px;
+	box-shadow: 12px 15px 20px 0px rgba(46, 61, 73, 0.15);
+}
+
+
 /* Header */
+
+.main{
+	height: 100%;
+}
+
+.navbar{
+	padding: 0;
+}
+
+.navbar-header{
+	padding: 0;
+}
+
+.active:hover{
+	background-color: black;
+}
+
+#fst{
+	font-size: 20px;
+}
+
+.active{
+	font-weight: bold;
+}
+
 
 .header{
 	background: rgb(153,47,255) fixed;
@@ -16,11 +94,6 @@
 	color: white;
 }
 
-.port{
-	height: 300px;
-	width: 420px;
-}
-
 .logo{
 	text-align: center;
 	padding: 30px;
@@ -31,12 +104,6 @@
 
 .nav{
 	text-align: center;
-}
-
-/* Tags */
-
-hr{
-	border-bottom-color: black;
 }
 
 /* Main page */
@@ -56,17 +123,46 @@ hr{
 	text-align: center;
 }
 
+.img-circle{
+	-webkit-box-shadow: inset 13px 2px 3px 0px rgba(50, 50, 50, 0.75);
+	-moz-box-shadow:    inset 13px 2px 3px 0px rgba(50, 50, 50, 0.75);
+	box-shadow:         inset 13px 2px 3px 0px rgba(50, 50, 50, 0.75);
+}
+
 .medias{
 	text-align: center;
 	margin: auto;
 }
 
+.front {
+	position:absolute;
+	width: 149px;
+	height: 180px;
+	color: transparent;
+	background-color: transparent;
+	text-align: center;
+	vertical-align: middle;
+	padding-top: 53px;
+}
+
+.front:hover{
+	background: -webkit-gradient(left top, right top, color-stop(0%, rgba(240, 84, 79,1)), color-stop(100%, rgba(39,139,255,1)));
+	background: -webkit-linear-gradient(left, rgba(153,47,255,1) 0%, rgba(240, 84, 79,1) 100%);
+	background: linear-gradient(to right, rgba(153,47,255,0.4) 0%, rgba(240, 84, 79,1) 100%);
+	color: white;
+	text-shadow: 2px 2px 4px #333;
+	transition: all 1s ease;
+}
+
+
 .pictures{
 	margin-bottom: 30px;
 }
 
-.photos{
+.photo{
 	padding: 15px 0;
+	width: 149px;
+	box-shadow: 12px 15px 20px 0px rgba(46, 61, 73, 0.15);
 }
 
 /* RELATIONSHIPS */
@@ -127,6 +223,13 @@ hr{
 .follow-red:hover{
 	background-color: #FF3F6F;
 	color: white;
+}
+
+/* Stats */
+
+.card-body{
+	margin-top: 30px;
+	box-shadow: 12px 15px 20px 0px rgba(46, 61, 73, 0.15);
 }
 
 .footer{

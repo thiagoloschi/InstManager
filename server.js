@@ -7,6 +7,9 @@ var session = require('client-sessions');
 var rqst = require('request-promise')
 var _ = require('lodash');
 
+//Initiates the API for Instagram login handler
+var ig = require('instagram-node').instagram();
+
 var Schema = mongoose.Schema;
 
 //Creates the api object
@@ -15,11 +18,11 @@ api = require('./models/api.js');
 //Creates the user object that will work as a sort of pagination to avoid unecessary requests to the server
 User = require('./models/user.js');
 
-//Initiates the API for Instagram login handler
-var ig = require('instagram-node').instagram();
-
 //Initiates the express application
 var app = express();
+
+app.set('port', (process.env.PORT || 5000));
+app.set('views', __dirname + '/public/views');
 
 //Connects to mongodb using Bluebird for promises
 mongoose.Promise = require('bluebird');
@@ -35,7 +38,7 @@ app.use(session({
   //this will become an environment variable with the proper secret
   secret: 'issoVAIvirarENVvar',
   duration: 30 * 60 * 1000,
-  activeDuration: 5 * 60 * 1000,
+  activeDuration: 30 * 60 * 1000,
   ephemeral: true
 }));
 
@@ -87,7 +90,7 @@ exports.handleauth = function(req, res) {
 			 })
 		  });
 
-		  res.redirect('http://localhost:5000/#!/main');
+		  res.redirect('/#!/main');
 		}
 	});
 };
@@ -95,125 +98,127 @@ exports.handleauth = function(req, res) {
 //------------------ API METHODS ----------------------//
 
 exports.getBasicInfo = function (req, res) {
-	User.findOne({ cod: req.session.cod }, function(err, user) {
-		if (user) {
-			res.locals.user = user;
-		}else {
-			res.redirect('/login');
-		}
-		if (user.basicInfo == null){
-            var info;
-			var options = {
-		    	uri: 'https://api.instagram.com/v1/users/self/',
-		    	qs: {
-		        	access_token: user.token
-		    	},
-		    	headers: {
-		        	'User-Agent': 'Request-Promise'
-		    	},
-		    	json: true
-				};
+    if(req.session.cod){
+    	User.findOne({ cod: req.session.cod }, function(err, user) {
+    		if (user) {
+    			res.locals.user = user;
+    		}else {
+                console.log('nao achou o codigo');
+    			res.redirect('/#!/end');
+    		}
+    		if (user.basicInfo == null){
+                var info;
+    			var options = {
+    		    	uri: 'https://api.instagram.com/v1/users/self/',
+    		    	qs: {
+    		        	access_token: user.token
+    		    	},
+    		    	headers: {
+    		        	'User-Agent': 'Request-Promise'
+    		    	},
+    		    	json: true
+    				};
 
-			rqst(options)
-			    .then(function (data) {
-                    User.update({ cod: req.session.cod }, { basicInfo: data.data }, options, function(err){
-                        if(err){
-                          var err = 'An error occurred when trying to save user to DB';
-                          console.log( err);
-                        }else {
+    			rqst(options)
+    			    .then(function (data) {
+                        User.update({ cod: req.session.cod }, { basicInfo: data.data }, options, function(err){
+                            if(err){
+                              var err = 'An error occurred when trying to save user to DB';
+                              console.log( err);
+                            }else {
 
-                            console.log('User ' + user.username + ' successfully updated basicInfo.');
-                        }
-                    });
-					res.send([data.data]);
-			    })
-			    .catch(function (err) {
-			        console.log('An error ocurred when requesting the basics', err);
-			    });
-        }else{
-			res.send(user.basicInfo);
-		}
-	});
+                                console.log('User ' + user.username + ' successfully updated basicInfo.');
+                            }
+                        });
+    					res.send([data.data]);
+    			    })
+    			    .catch(function (err) {
+    			        console.log('An error ocurred when requesting the basics', err);
+    			    });
+            }else{
+    			res.send(user.basicInfo);
+    		}
+    	});
+    }else {
+        console.log('Session expired.');
+        res.redirect('/');
+    }
 };
 
 exports.getFollowers = function (req, res) {
-	User.findOne({ cod: req.session.cod }, function(err, user) {
-		if (user) {
-			res.locals.user = user;
-		}else {
-			res.redirect('/login');
-		}
-		if(user.followers == null){
-			var options = {
-	    	uri: 'https://api.instagram.com/v1/users/self/followed-by',
-	    	qs: {
-	        	access_token: user.token
-	    	},
-	    	headers: {
-	        	'User-Agent': 'Request-Promise'
-	    	},
-	    	json: true
-			};
+    	User.findOne({ cod: req.session.cod }, function(err, user) {
+    		if (user) {
+    			res.locals.user = user;
+    		}else {
+    			res.redirect('/end');
+    		}
 
-    		rqst(options)
-            .then(function (data) {
-                User.update({ cod: req.session.cod }, { followers: _.drop(data.data,1) }, options, function(err){
-                    if(err){
-                      var err = 'An error occurred when trying to save users followers';
-                      console.log( err);
-                    }else {
-                        console.log('User ' + user.username + ' successfully updated followers.');
-                    }
+    			var options = {
+    	    	uri: 'https://api.instagram.com/v1/users/self/followed-by',
+    	    	qs: {
+    	        	access_token: user.token
+    	    	},
+    	    	headers: {
+    	        	'User-Agent': 'Request-Promise'
+    	    	},
+    	    	json: true
+    			};
+
+        		rqst(options)
+                .then(function (data) {
+                    User.update({ cod: req.session.cod }, { followers: data.data }, options, function(err){
+                        if(err){
+                          var err = 'An error occurred when trying to save users followers';
+                          console.log( err);
+                        }else {
+                            console.log('User ' + user.username + ' successfully updated followers.');
+                        }
+                    });
+                    res.send(data.data);
+                })
+                .catch(function (err) {
+                    console.log('An error ocurred when requesting the followers');
                 });
-                res.send(_.drop(data.data,1));
-            })
-            .catch(function (err) {
-                console.log('An error ocurred when requesting the followers');
-            });
-        }else{
-            res.send(user.followers);
-        }
-    });
-};
+
+        });
+
+    };
 
 exports.getFollowings = function (req, res) {
-	User.findOne({ cod: req.session.cod }, function(err, user) {
-		if (user) {
-			res.locals.user = user;
-		}else {
-			res.redirect('/login');
-		}
-		if(user.followings == null){
-			var options = {
-	    	uri: 'https://api.instagram.com/v1/users/self/follows',
-	    	qs: {
-	        	access_token: user.token
-	    	},
-	    	headers: {
-	        	'User-Agent': 'Request-Promise'
-	    	},
-	    	json: true
-			};
+    	User.findOne({ cod: req.session.cod }, function(err, user) {
+    		if (user) {
+    			res.locals.user = user;
+    		}else {
+    			res.redirect('/end');
+    		}
 
-            rqst(options)
-            .then(function (data) {
-                User.update({ cod: req.session.cod }, { followings: _.dropRight(data.data,1) }, options, function(err){
-                    if(err){
-                      var err = 'An error occurred when trying to save users followings';
-                      console.log( err);
-                    }else {
-                        console.log('User ' + user.username + ' successfully updated followings.');
-                    }
+    			var options = {
+    	    	uri: 'https://api.instagram.com/v1/users/self/follows',
+    	    	qs: {
+    	        	access_token: user.token
+    	    	},
+    	    	headers: {
+    	        	'User-Agent': 'Request-Promise'
+    	    	},
+    	    	json: true
+    			};
+
+                rqst(options)
+                .then(function (data) {
+                    User.update({ cod: req.session.cod }, { followings: data.data }, options, function(err){
+                        if(err){
+                          var err = 'An error occurred when trying to save users followings';
+                          console.log( err);
+                        }else {
+                            console.log('User ' + user.username + ' successfully updated followings.');
+                        }
+                    });
+                    res.send(data.data);
+                })
+                .catch(function (err) {
+                    console.log('An error ocurred when requesting the followings');
                 });
-                res.send(_.dropRight(data.data,1));
-            })
-            .catch(function (err) {
-                console.log('An error ocurred when requesting the followings');
-            });
-        }else{
-            res.send(user.followings);
-        }
-    });
+        });
 };
 
 
@@ -222,7 +227,7 @@ exports.getNotRelated = function(req, res) {
 		if (user) {
 			res.locals.user = user;
 		}else {
-			res.redirect('/login');
+			res.redirect('/end');
 		}
 
         var notFollowing = [];
@@ -248,7 +253,7 @@ exports.getMedias = function (req, res) {
 		if (user) {
 			res.locals.user = user;
 		}else {
-			res.redirect('/login');
+			res.redirect('/end');
 		}
 		if (user.medias == null){
 			var options = {
@@ -288,7 +293,7 @@ exports.getStats = function(req, res) {
 		if (user) {
 			res.locals.user = user;
 		}else {
-			res.redirect('/login');
+			res.redirect('/end');
 		}
 
         var tags = []; //all tags
@@ -369,18 +374,54 @@ exports.getStats = function(req, res) {
     });
 };
 
-exports.finalize = function(req, res) {
-	User.findOne({ cod: req.session.cod }, function(err, user) {
+exports.changeRel = function (req, res){
+    User.findOne({ cod: req.session.cod }, function(err, user) {
 		if (user) {
-			User.deleteOne({ cod: req.session.cod }, function (err) {
-				if(err)
-					console.log('User ',req.session.username, ' could not be deleted at the end of application', err);
-			});
+			res.locals.user = user;
+		}else {
+			res.redirect('/end');
 		}
+
+        var user_id = req.params.id;
+        var action = req.params.action;
+
+        ig.use({
+            client_id: api.client_id,
+            client_secret: api.client_secret,
+            access_token: user.token
+        });
+        ig.set_user_relationship(user_id, action, function(err, result, remaining, limit) {
+            if(err){
+                console.error(err.error_message);
+                res.send(err.error_message);
+            }else{
+                console.log(user.username, 'just changed relationship status with', user_id ,' to', result.outgoing_status,'.');
+                res.send(result);
+            }
+        });
+
 	});
-	console.log('End of session for %s.', req.session.username);
+};
+
+
+exports.finalize = function(req, res) {
+    if (req.session.cod) {
+        User.findOne({ cod: req.session.cod }, function(err, user) {
+    		if (user) {
+    			User.deleteOne({ cod: req.session.cod }, function (err) {
+    				if(err){
+    					console.log('User ',req.session.username, ' could not be deleted at the end of application', err);
+                    }else {
+                        console.log('End of session for %s.', req.session.username);
+                    }
+                });
+    		}
+    	});
+    }
+    console.log('End of session.');
 	res.redirect('/');
 };
+
 
 //------------------------ ROUTES --------------------------
 
@@ -391,6 +432,8 @@ app.get('/login', exports.authorize_user);
 // Redirect URI
 app.get('/callback/', exports.handleauth);
 
+app.get('/changeRel/:id/:action', exports.changeRel);
+
 // Api methods callings
 app.get('/data/user', exports.getBasicInfo);
 app.get('/data/followers', exports.getFollowers);
@@ -399,6 +442,6 @@ app.get('/data/notrelated', exports.getNotRelated);
 app.get('/data/medias', exports.getMedias);
 app.get('/data/stats', exports.getStats);
 
-
-app.listen(5000);
-console.log('InstManager is now running...');
+app.listen(app.get('port'), function() {
+	console.log('InstManager is now running on port', app.get('port'));
+});
