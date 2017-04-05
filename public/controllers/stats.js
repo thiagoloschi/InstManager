@@ -7,6 +7,8 @@ instApp.controller('statsController', ['$scope', '$http', '$location', '$routePa
 	$scope.getUser = function(){
 		$http.get('/data/user').then(function(response) {
 			$scope.user = response.data[0];
+		}, function(response){
+			$location.url(response.data);
 		})
 	}
 
@@ -17,6 +19,8 @@ instApp.controller('statsController', ['$scope', '$http', '$location', '$routePa
             $scope.places = response.data.places;
             $scope.totalLikes = response.data.totalLikes;
             console.log(response.data);
-        })
+        }, function(response){
+			$location.url(response.data);
+		})
     }
 }]);

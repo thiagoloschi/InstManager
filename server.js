@@ -13,7 +13,11 @@ var ig = require('instagram-node').instagram();
 var Schema = mongoose.Schema;
 
 //Creates the api object
-api = require('./models/api.js');
+var api = {
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+    redirect_uri: process.env.REDIRECT_URI
+};
 
 //Creates the user object that will work as a sort of pagination to avoid unecessary requests to the server
 User = require('./models/user.js');
@@ -26,7 +30,7 @@ app.set('views', __dirname + '/public/views');
 
 //Connects to mongodb using Bluebird for promises
 mongoose.Promise = require('bluebird');
-mongoose.connect('mongodb://localhost/instmanager');
+mongoose.connect(process.env.DATABASE_URI);
 
 //Middlewares
 app.use(express.static(__dirname+'/public'));
@@ -36,7 +40,7 @@ app.use(bodyParser.json());
 app.use(session({
   cookieName: 'session',
   //this will become an environment variable with the proper secret
-  secret: 'issoVAIvirarENVvar',
+  secret: process.env.COOKIE_SECRET,
   duration: 30 * 60 * 1000,
   activeDuration: 30 * 60 * 1000,
   ephemeral: true
@@ -98,61 +102,60 @@ exports.handleauth = function(req, res) {
 //------------------ API METHODS ----------------------//
 
 exports.getBasicInfo = function (req, res) {
-    if(req.session.cod){
+    if(req.session.cod != undefined){
     	User.findOne({ cod: req.session.cod }, function(err, user) {
-    		if (user) {
-    			res.locals.user = user;
-    		}else {
+    		if (!user) {
                 console.log('nao achou o codigo');
-    			res.redirect('/#!/end');
-    		}
-    		if (user.basicInfo == null){
-                var info;
-    			var options = {
-    		    	uri: 'https://api.instagram.com/v1/users/self/',
-    		    	qs: {
-    		        	access_token: user.token
-    		    	},
-    		    	headers: {
-    		        	'User-Agent': 'Request-Promise'
-    		    	},
-    		    	json: true
-    				};
+    			res.status(500).send('/end');
+    		}else {
+                res.locals.user = user;
+                if (user.basicInfo == null){
+                    var info;
+        			var options = {
+        		    	uri: 'https://api.instagram.com/v1/users/self/',
+        		    	qs: {
+        		        	access_token: user.token
+        		    	},
+        		    	headers: {
+        		        	'User-Agent': 'Request-Promise'
+        		    	},
+        		    	json: true
+        				};
 
-    			rqst(options)
-    			    .then(function (data) {
-                        User.update({ cod: req.session.cod }, { basicInfo: data.data }, options, function(err){
-                            if(err){
-                              var err = 'An error occurred when trying to save user to DB';
-                              console.log( err);
-                            }else {
+        			rqst(options)
+        			    .then(function (data) {
+                            User.update({ cod: req.session.cod }, { basicInfo: data.data }, options, function(err){
+                                if(err){
+                                  var err = 'An error occurred when trying to save user to DB';
+                                  console.log( err);
+                                }else {
 
-                                console.log('User ' + user.username + ' successfully updated basicInfo.');
-                            }
-                        });
-    					res.send([data.data]);
-    			    })
-    			    .catch(function (err) {
-    			        console.log('An error ocurred when requesting the basics', err);
-    			    });
-            }else{
-    			res.send(user.basicInfo);
+                                    console.log('User ' + user.username + ' successfully updated basicInfo.');
+                                }
+                            });
+        					res.send([data.data]);
+        			    })
+        			    .catch(function (err) {
+        			        console.log('An error ocurred when requesting the basics', err);
+        			    });
+                }else{
+        			res.send(user.basicInfo);
+        		}
     		}
     	});
     }else {
-        console.log('Session expired.');
-        res.redirect('/');
+        console.log('No session found. Session cookie may be expired.');
+        res.status(500).send('/end');
     }
 };
 
 exports.getFollowers = function (req, res) {
-    	User.findOne({ cod: req.session.cod }, function(err, user) {
-    		if (user) {
-    			res.locals.user = user;
+    if(req.session.cod != undefined){
+        User.findOne({ cod: req.session.cod }, function(err, user) {
+    		if (!user) {
+                res.status(500).send('/end');
     		}else {
-    			res.redirect('/end');
-    		}
-
+                res.locals.user = user;
     			var options = {
     	    	uri: 'https://api.instagram.com/v1/users/self/followed-by',
     	    	qs: {
@@ -179,19 +182,22 @@ exports.getFollowers = function (req, res) {
                 .catch(function (err) {
                     console.log('An error ocurred when requesting the followers');
                 });
-
-        });
-
-    };
-
-exports.getFollowings = function (req, res) {
-    	User.findOne({ cod: req.session.cod }, function(err, user) {
-    		if (user) {
-    			res.locals.user = user;
-    		}else {
-    			res.redirect('/end');
     		}
 
+        });
+    }else {
+        console.log('No session found. Session cookie may be expired.');
+        res.status(500).send('/end');
+    }
+};
+
+exports.getFollowings = function (req, res) {
+    if(req.session.cod != undefined){
+    	User.findOne({ cod: req.session.cod }, function(err, user) {
+    		if (!user) {
+                res.status(500).send('/end');
+    		}else {
+                res.locals.user = user;
     			var options = {
     	    	uri: 'https://api.instagram.com/v1/users/self/follows',
     	    	qs: {
@@ -218,194 +224,217 @@ exports.getFollowings = function (req, res) {
                 .catch(function (err) {
                     console.log('An error ocurred when requesting the followings');
                 });
+    		}
         });
+    }else {
+        console.log('No session found. Session cookie may be expired.');
+        res.status(500).send('/end');
+    }
 };
 
-
 exports.getNotRelated = function(req, res) {
-	User.findOne({ cod: req.session.cod }, function(err, user) {
-		if (user) {
-			res.locals.user = user;
-		}else {
-			res.redirect('/end');
-		}
+    if(req.session.cod != undefined){
+        User.findOne({ cod: req.session.cod }, function(err, user) {
+    		if (!user) {
+                res.status(500).send('/end');
+    		}else {
+                res.locals.user = user;
+                var notFollowing = [];
+                var notFollower = [];
+                notFollowing = _.differenceWith(user.followers, user.followings, _.isEqual);
+        		notFollower = _.differenceWith(user.followings, user.followers, _.isEqual);
+        		user.notRelated = {
+        			notFollowings: notFollowing,
+        			notFollowers: notFollower
+        		}
+        		res.send(user.notRelated);
+                user.save(function(err){
+                  if(err){
+                      var err = 'An error occurred when trying to save user to DB at getFollowings';
+                      console.log(err);
+                  }
+                })
+    		}
 
-        var notFollowing = [];
-        var notFollower = [];
-        notFollowing = _.differenceWith(user.followers, user.followings, _.isEqual);
-		notFollower = _.differenceWith(user.followings, user.followers, _.isEqual);
-		user.notRelated = {
-			notFollowings: notFollowing,
-			notFollowers: notFollower
-		}
-		res.send(user.notRelated);
-        user.save(function(err){
-          if(err){
-              var err = 'An error occurred when trying to save user to DB at getFollowings';
-              console.log(err);
-          }
-        })
-	});
+    	});
+    }else {
+        console.log('No session found. Session cookie may be expired.');
+        res.status(500).send('/end');
+    }
 };
 
 exports.getMedias = function (req, res) {
-	User.findOne({ cod: req.session.cod }, function(err, user) {
-		if (user) {
-			res.locals.user = user;
-		}else {
-			res.redirect('/end');
-		}
-		if (user.medias == null){
-			var options = {
-		    	uri: 'https://api.instagram.com/v1/users/self/media/recent/',
-		    	qs: {
-		        	access_token: user.token
-		    	},
-		    	headers: {
-		        	'User-Agent': 'Request-Promise'
-		    	},
-		    	json: true
-			};
+    if(req.session.cod != undefined){
+        User.findOne({ cod: req.session.cod }, function(err, user) {
+    		if (!user) {
+                res.status(500).send('/end');
+    		}else {
+                res.locals.user = user;
+                if (user.medias == null){
+        			var options = {
+        		    	uri: 'https://api.instagram.com/v1/users/self/media/recent/',
+        		    	qs: {
+        		        	access_token: user.token
+        		    	},
+        		    	headers: {
+        		        	'User-Agent': 'Request-Promise'
+        		    	},
+        		    	json: true
+        			};
 
-            rqst(options)
-            .then(function (data) {
-                User.update({ cod: req.session.cod }, { medias: data.data }, options, function(err){
-                    if(err){
-                      var err = 'An error occurred when trying to save users medias';
-                      console.log( err);
-                    }else {
-                        console.log('User ' + user.username + ' successfully updated medias.');
-                    }
-                });
-                res.send(data.data);
-            })
-            .catch(function (err) {
-                console.log('An error ocurred when requesting the medias');
-            });
-        }else{
-            res.send(user.medias);
-        }
-    });
+                    rqst(options)
+                    .then(function (data) {
+                        User.update({ cod: req.session.cod }, { medias: data.data }, options, function(err){
+                            if(err){
+                              var err = 'An error occurred when trying to save users medias';
+                              console.log( err);
+                            }else {
+                                console.log('User ' + user.username + ' successfully updated medias.');
+                            }
+                        });
+                        res.send(data.data);
+                    })
+                    .catch(function (err) {
+                        console.log('An error ocurred when requesting the medias');
+                    });
+                }else{
+                    res.send(user.medias);
+                }
+    		}
+        });
+    }else {
+        console.log('No session found. Session cookie may be expired.');
+        res.status(500).send('/end');
+    }
 };
 
 exports.getStats = function(req, res) {
-    User.findOne({ cod: req.session.cod }, function(err, user) {
-		if (user) {
-			res.locals.user = user;
-		}else {
-			res.redirect('/end');
-		}
+    if(req.session.cod != undefined){
+        User.findOne({ cod: req.session.cod }, function(err, user) {
+    		if (!user) {
+                res.status(500).send('/end');
+    		}else {
+                res.locals.user = user;
+                var tags = []; //all tags
+            	var dicTags = [];
+            	var totalLikes = 0;
+            	var location = [];
+            	var dicLocal = [];
+            	var tagged = [];
+            	var dicTagged = [];
 
-        var tags = []; //all tags
-    	var dicTags = [];
-    	var totalLikes = 0;
-    	var location = [];
-    	var dicLocal = [];
-    	var tagged = [];
-    	var dicTagged = [];
+            	//tags
+            	_.forEach(user.medias, function(media) {
+            		_.forEach(media.tags, function(tag) {
+            			tags.push(tag);
+            		});
+            	});
 
-    	//tags
-    	_.forEach(user.medias, function(media) {
-    		_.forEach(media.tags, function(tag) {
-    			tags.push(tag);
-    		});
-    	});
+            	tags = _.countBy(tags);
 
-    	tags = _.countBy(tags);
+            	_.forEach(tags, function(value, key) {
+            		dicTags.push({
+            			name: key,
+            			freq: value
+            		});
+            	});
 
-    	_.forEach(tags, function(value, key) {
-    		dicTags.push({
-    			name: key,
-    			freq: value
-    		});
-    	});
+            	dicTags = _.orderBy(dicTags, 'freq', 'desc');
 
-    	dicTags = _.orderBy(dicTags, 'freq', 'desc');
+            	dicTags = _.slice(dicTags, 0, 10);
 
-    	dicTags = _.slice(dicTags, 0, 10);
+            	//location and total of likes
+            	_.forEach(user.medias, function(media) {
+            		totalLikes += media.likes.count;
+            		if(media.location != null)
+            			location.push(media.location.name);
+            	});
 
-    	//location and total of likes
-    	_.forEach(user.medias, function(media) {
-    		totalLikes += media.likes.count;
-    		if(media.location != null)
-    			location.push(media.location.name);
-    	});
+            	location = _.countBy(location);
 
-    	location = _.countBy(location);
+            	_.forEach(location, function(value, key) {
+            		dicLocal.push({
+            			name: key,
+            			freq: value
+            		});
+            	});
 
-    	_.forEach(location, function(value, key) {
-    		dicLocal.push({
-    			name: key,
-    			freq: value
-    		});
-    	});
-
-    	dicLocal = _.orderBy(dicLocal, 'freq', 'desc');
-    	dicLocal = _.slice(dicLocal, 0, 10);
-
-
-    	//user tagged in the photos
-    	_.forEach(user.medias, function(line) {
-    		_.forEach(line.users_in_photo, function(u) {
-    			tagged.push(u.user.username);
-    		});
-    	});
-
-    	tagged = _.countBy(tagged);
+            	dicLocal = _.orderBy(dicLocal, 'freq', 'desc');
+            	dicLocal = _.slice(dicLocal, 0, 10);
 
 
-    	_.forEach(tagged, function(value, key) {
-    		dicTagged.push({
-    			username: key,
-    			freq: value
-    		});
-    	});
+            	//user tagged in the photos
+            	_.forEach(user.medias, function(line) {
+            		_.forEach(line.users_in_photo, function(u) {
+            			tagged.push(u.user.username);
+            		});
+            	});
 
-    	dicTagged = _.orderBy(dicTagged, 'freq', 'desc');
-    	dicTagged = _.slice(dicTagged, 0, 10);
+            	tagged = _.countBy(tagged);
 
-    	var stats = {
-    		words: dicTags,
-    		totalLikes: totalLikes,
-    		places: dicLocal,
-    		tagged_users: dicTagged
-    	};
-    	res.send(stats);
-    });
+
+            	_.forEach(tagged, function(value, key) {
+            		dicTagged.push({
+            			username: key,
+            			freq: value
+            		});
+            	});
+
+            	dicTagged = _.orderBy(dicTagged, 'freq', 'desc');
+            	dicTagged = _.slice(dicTagged, 0, 10);
+
+            	var stats = {
+            		words: dicTags,
+            		totalLikes: totalLikes,
+            		places: dicLocal,
+            		tagged_users: dicTagged
+            	};
+            	res.send(stats);
+            }
+        });
+    }else {
+        console.log('No session found. Session cookie may be expired.');
+        res.status(500).send('/end');
+    }
 };
 
 exports.changeRel = function (req, res){
-    User.findOne({ cod: req.session.cod }, function(err, user) {
-		if (user) {
-			res.locals.user = user;
-		}else {
-			res.redirect('/end');
-		}
+    if(req.session.cod != undefined){
+        User.findOne({ cod: req.session.cod }, function(err, user) {
+    		if (!user) {
+                res.status(500).send('/end');
+    		}else {
+                res.locals.user = user;
+                var user_id = req.params.id;
+                var action = req.params.action;
 
-        var user_id = req.params.id;
-        var action = req.params.action;
+                ig.use({
+                    client_id: api.client_id,
+                    client_secret: api.client_secret,
+                    access_token: user.token
+                });
+                ig.set_user_relationship(user_id, action, function(err, result, remaining, limit) {
+                    if(err){
+                        console.error(err.error_message);
+                        res.send(err.error_message);
+                    }else{
+                        console.log(user.username, 'just changed relationship status with', user_id ,' to', result.outgoing_status,'.');
+                        res.send(result);
+                    }
+                });
+    		}
 
-        ig.use({
-            client_id: api.client_id,
-            client_secret: api.client_secret,
-            access_token: user.token
-        });
-        ig.set_user_relationship(user_id, action, function(err, result, remaining, limit) {
-            if(err){
-                console.error(err.error_message);
-                res.send(err.error_message);
-            }else{
-                console.log(user.username, 'just changed relationship status with', user_id ,' to', result.outgoing_status,'.');
-                res.send(result);
-            }
-        });
 
-	});
+    	});
+    }else {
+        console.log('No session found. Session cookie may be expired.');
+        res.status(500).send('/end');
+    }
 };
 
 
 exports.finalize = function(req, res) {
-    if (req.session.cod) {
+    if (req.session.cod != undefined) {
         User.findOne({ cod: req.session.cod }, function(err, user) {
     		if (user) {
     			User.deleteOne({ cod: req.session.cod }, function (err) {

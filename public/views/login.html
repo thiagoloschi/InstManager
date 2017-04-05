@@ -2,26 +2,81 @@
 
 	<img src="http://instagram.com/accounts/logout/" width="0" height="0"/>
 	<center>
-		<div style="margin-bottom: 50px;">
-			<a class="lgnbutton" role="button" href="/login">Login with Instagram</a>
-		</div>
+		<div class="container">
 
 
-		<div class="row" style="padding: 0 60px;">
+			<div class="row">
+				<div class="showcase">
+					<div class="col-md-4" style="-webkit-transform: rotate(-7deg); transform: rotate(-7deg);">
+						<a class="foto" role="button" data-desc="Follow and unfollow friends and see who follows you back." data-id="img/relationships.png" data-toggle="modal" data-target="#myModal" href="#"><img class="thumbnail port" src="img/relationships.png"></a>
+					</div>
 
-			<div class="col-md-4" style="-webkit-transform: rotate(-7deg); transform: rotate(-7deg);">
-				<img class="thumbnail port image-responsive" src="img/relationships.png">
+					<div class="col-md-4">
+						<a class="foto" role="button" data-desc="See your profile information in a unique look." data-id="img/main.png" data-toggle="modal" data-target="#myModal" href="#"><img class="thumbnail port" src="img/main.png"></a>
+					</div>
+
+					<div class="col-md-4" style="-webkit-transform: rotate(7deg); transform: rotate(7deg);">
+						<a class="foto" role="button" data-desc="See cool statistics about your user account." data-id="img/stats.png" data-toggle="modal" data-target="#myModal" href="#"><img class="thumbnail port" src="img/stats.png"></a>
+					</div>
+				</div>
 			</div>
 
-			<div class="col-md-4">
-				<img class="thumbnail port" src="img/main.png">
+			<!-- Modal -->
+			 <div class="modal fade" id="myModal" role="dialog">
+			   <div class="modal-dialog">
+				 <div class="modal-header">
+					 <button type="button" class="close" data-dismiss="modal">&times;</button>
+				 </div>
+				 <!-- Modal content-->
+				 <div class="modal-content">
+				   <div class="modal-body">
+					   <div name="photo" id="photo"></div>
+				   </div>
+
+				   <div class="modal-footer">
+
+				   </div>
+				 </div>
+
+			   </div>
+			 </div>
+
+			<p class="description"><strong>InstManager</strong> is a Node.js based web application, created with the purpose of providing Instagram users with cool features and insights from your favorite photo app. Get to know which of your friends were most tagged on your pictures, and what tags and locations you've used the most. You will also be able to manage your relationships to other users. See who doesn't follow you back and who you don't follow back. It's never been so easy to manage your Instagram Account. New features are being developed and will be available soon.
+
+			<div style="margin-bottom: 10%;">
+				<a class="lgnbutton" role="button" href="/login">Login with Instagram</a>
 			</div>
 
-			<div class="col-md-4" style="-webkit-transform: rotate(7deg); transform: rotate(7deg);">
-				<img class="thumbnail port" src="img/stats.png">
-			</div>
 		</div>
 
 	</center>
+	<br>
+	<footer class="footer footer-login">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4">
+					<a href="#!/terms">Terms of Use</a>
+				</div>
+				<div class="col-md-4">
+					<a href="#!/privacy">Privacy Policy</a>
+
+				</div>
+				<div class="col-md-4">
+					<a href="#!/developer">Meet the developer</a>
+				</div>
+			</div>
+		</div>
+	</footer>
 
 </div>
+
+
+
+<script type="text/javascript">
+	$(document).on("click", ".foto", function () {
+		var path = $(this).data('id');
+		var desc = $(this).data('desc');
+		$(".modal-body #photo").html('<img class="img-responsive" src="'+path+'" style="width: 100%"/>');
+		$(".modal-footer").text(desc);
+	});
+</script>

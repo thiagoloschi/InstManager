@@ -1,10 +1,10 @@
-<div class="container main" ng-init="getUser()">
+<div class="container" ng-init="getUser()">
 
 	<div class="nav">
 		<div class="navbar-header col-md-5 col-sm-12">
 		  <span id="fst" class="navbar-brand">Hi <strong>{{user.username}}</strong>, what would you like to do?</span>
 		</div>
-		<div id="navbar" class="navbar col-md-7 col-sm-12">
+		<div id="navbar" class="col-md-7 col-sm-12">
 		  <ul class="nav navbar-nav">
 			<li><a href="#!/main">See My Profile</a></li>
 			<li><a href="#!/relationships">Manage My Relationships</a></li>
@@ -15,6 +15,8 @@
 	</div>
 
 	<hr>
+
+	<br>
 
 	<div class="row">
 		<div class="card col-md-4">
@@ -30,7 +32,7 @@
 
 						<div class="card-line row">
 							<div class="col-sm-9">
-								<a href="#">{{tagged.username}}</a>
+								<a href="https://www.instagram.com/{{tagged.username}}" target="_blank">{{tagged.username}}</a>
 							</div>
 							<div class="col-sm-3">
 								<strong>{{tagged.freq}}</strong>x
@@ -54,7 +56,7 @@
 
 						<div class="card-line row">
 							<div class="col-sm-9">
-								<a href="#">#{{tag.name}}</a>
+								<a href="https://www.instagram.com/explore/tags/{{tag.name}}/" target="_blank">#{{tag.name}}</a>
 							</div>
 							<div class="col-sm-3">
 								<strong>{{tag.freq}}</strong>x
@@ -78,7 +80,7 @@
 
 						<div class="card-line row">
 							<div class="col-sm-9">
-								<a href="#">{{place.name}}</a>
+								<a >{{place.name}}</a>
 							</div>
 							<div class="col-sm-3">
 								<strong>{{place.freq}}</strong>x
@@ -89,4 +91,22 @@
 			</div>
 		</div>
 	</div>
+	<br><br><br>
 </div>
+
+<footer class="footer">
+	<div class="container">
+		<div class="row footer-wrapper">
+			<div class="col-md-4">
+				<a href="#!/terms">Terms of Use</a>
+			</div>
+			<div class="col-md-4">
+				<a href="#!/privacy">Privacy Policy</a>
+
+			</div>
+			<div class="col-md-4">
+				<a href="#!/developer">Meet the developer</a>
+			</div>
+		</div>
+	</div>
+</footer>

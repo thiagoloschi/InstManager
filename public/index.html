@@ -2,18 +2,24 @@
 <html ng-app="instApp">
 <head>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 	<title>InstManager</title>
 	<link rel="icon" href="/img/fav.ico" type="image/x-icon" />
-	<link href="https://fonts.googleapis.com/css?family=Amatic+SC:700|Raleway:400,600" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Amatic+SC:700|Raleway:400,600|Open+Sans|Roboto|Source+Sans+Pro" rel="stylesheet">
 	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
 	<link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="bower_components/sweetalert/dist/sweetalert.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
+
 
 </head>
 <body >
+	<div class="container-fluid">
+
+
 	<div class="header navbar">
 		<div class="logo">
-			InstManager
+			<p>InstManager</p>
 		</div>
 
 	</div>
@@ -24,6 +30,11 @@
 
     </div>
 
+
+	</div>
+
+
+
 	<link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
 	<script src="/bower_components/jquery/dist/jquery.js"></script>
 	<script src="/bower_components/angular/angular.js"></script>
@@ -33,5 +44,16 @@
 	<script src="/controllers/main.js"></script>
 	<script src="/controllers/relationships.js"></script>
 	<script src="/controllers/stats.js"></script>
+	<script src="/bower_components/sweetalert/dist/sweetalert.min.js"></script>
+
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-96337282-2', 'auto');
+		ga('send', 'pageview');
+	</script>
 </body>
 </html>

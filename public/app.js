@@ -17,6 +17,18 @@ instApp.config(function($routeProvider){
 		controller:'statsController',
 		templateUrl: 'views/stats.html'
 	})
+	$routeProvider.when('/terms', {
+		controller:'statsController',
+		templateUrl: 'views/terms.html'
+	})
+	$routeProvider.when('/privacy', {
+		controller:'statsController',
+		templateUrl: 'views/privacy.html'
+	})
+	$routeProvider.when('/developer', {
+		controller:'statsController',
+		templateUrl: 'views/developer.html'
+	})
 	.otherwise({
 		redirectTo: '/'
 	});

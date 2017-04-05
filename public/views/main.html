@@ -4,7 +4,7 @@
 		<div class="navbar-header col-md-5 col-sm-12">
 		  <span id="fst" class="navbar-brand">Hi <strong>{{user.username}}</strong>, what would you like to do?</span>
 		</div>
-		<div id="navbar" class="navbar col-md-7 col-sm-12">
+		<div id="navbar" class="col-md-7 col-sm-12">
 		  <ul class="nav navbar-nav">
 			<li class="active"><a href="#!/main">See My Profile</a></li>
 			<li><a href="#!/relationships">Manage My Relationships</a></li>
@@ -16,12 +16,12 @@
 
 	<hr>
 
-	<br><br>
+	<br>
 
 	<div class="profile" ng-init="getUser()">
 		<div class="row">
 			<div class="username">
-				<img class="img-circle" src="{{user.profile_picture}}" alt="profile picture">
+				<img class="img-circle" src="{{user.profile_picture}}">
 				<div class="username">
 					<h3>{{user.full_name}}</h3>
 				</div>
@@ -50,35 +50,40 @@
 	</div>
 	<hr>
 
-	<br><br><br>
+	<br><br>
 
 
-	<div class="row medias" ng-init="getMedias()">
-		<div  ng-repeat="media in medias">
-			<div class="pictures col-md-3 col-sm-3 col-xs-6 col-lg-2">
-				<div class="front thumbnail">
-					<h1><strong>{{media.likes.count}}</strong> <i class="fa fa-heart" aria-hidden="true"></i></h1>
+	<div class="row medias-wrapper" ng-init="getMedias()">
+		<div class="medias">
+			<div ng-repeat="media in medias">
+				<div class="pictures col-md-3 col-sm-4 col-xs-6 col-lg-2">
+					<a class="front thumbnail" ng-click="openphoto()">
+						<h1><strong>{{media.likes.count}}</strong> <i class="fa fa-heart" aria-hidden="true"></i></h1>
+					</a>
+					<div class="photo thumbnail" >
+						<img class="photos" src="{{media.images.thumbnail.url}}" title="{{media.caption.text}}" alt="{{media.caption.text}}"/ >
+					</div>
 				</div>
-				<div class="photo thumbnail">
-
-					<img class="photos" src="{{media.images.thumbnail.url}}" title="{{media.caption.text}}" alt="{{media.caption.text}}"/ >
-				</div>
-
 			</div>
+
 		</div>
 	</div>
 
 </div>
 
-<footer>
-		<hr>
-			<span>Terms of Use</span>
-			<span>Meet the developer</span>
-			<span>About the API</span>
-			<span>Terms of Use</span>
-			<span>Meet the developer</span>
-			<span>About the API</span><span>Terms of Use</span>
-			<span>Meet the developer</span>
-			<span>About the API</span>
+<footer class="footer">
+	<div class="container">
+		<div class="row footer-wrapper">
+			<div class="col-md-4">
+				<a href="#!/terms">Terms of Use</a>
+			</div>
+			<div class="col-md-4">
+				<a href="#!/privacy">Privacy Policy</a>
 
+			</div>
+			<div class="col-md-4">
+				<a href="#!/developer">Meet the developer</a>
+			</div>
+		</div>
+	</div>
 </footer>

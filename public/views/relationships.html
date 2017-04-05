@@ -4,7 +4,7 @@
 		<div class="navbar-header col-md-5 col-sm-12">
 		  <span id="fst" class="navbar-brand">Hi <strong>{{user.username}}</strong>, what would you like to do?</span>
 		</div>
-		<div id="navbar" class="navbar col-md-7 col-sm-12">
+		<div id="navbar" class="col-md-7 col-sm-12">
 		  <ul class="nav navbar-nav">
 			<li><a href="#!/main">See My Profile</a></li>
 			<li class='active'><a href="#!/relationships">Manage My Relationships</a></li>
@@ -18,7 +18,7 @@
 
 	<br><br>
 
-	<div class="row">
+	<div class="row cell">
 		<div class="col-md-3 col-sm-6">
 		    <div class="card-header">
 		        <h4>
@@ -27,8 +27,9 @@
 		        </h4>
 		    </div>
 		    <div class="card-body">
-	            <ul class="list-group list-group-lg">
-	                <li class="list-group-item" ng-repeat="person in followers">
+				<li class="list-group-item searchwrapper"><input class="searchline" placeholder="&#xF002  Search" style="font-family:Raleway, FontAwesome"  type="text" ng-model="findfollower"/></li>
+				<ul class="list-group list-group-lg card-ul">
+	                <li class="list-group-item" ng-repeat="person in followers | filter: {username : findfollower}">
 
 						<div class="card-line row">
 							<div class="col-sm-12">
@@ -37,7 +38,7 @@
 								      <img src="{{person.profile_picture}}" class="media-object thumb-sm br-radius">
 								  </div>
 								  <div class="media-body">
-								    <a href="">{{person.username}}</a>
+								    <a href="http://instagram.com/{{person.username}}" target="_blank">{{person.username}}</a>
 								  </div>
 								</div>
 							</div>
@@ -55,31 +56,45 @@
 			<div class="card-header">
 				<h4>
 					<strong>{{user.counts.follows}}</strong>
-					Followings
+					Following
 				</h4>
 			</div>
 			<div class="card-body">
-				<ul class="list-group list-group-lg">
-					<li class="list-group-item" ng-repeat="person in followings">
-						<div class="card-line row">
-							<div class="col-sm-9">
-								<div class="media">
-								  <div class="media-left">
-									  <img src="{{person.profile_picture}}" class="media-object thumb-sm br-radius">
-								  </div>
-								  <div class="media-body">
-									<a href="">{{person.username}}</a>
-								  </div>
-								</div>
+					<li class="list-group-item searchwrapper"><input class="searchline" placeholder="&#xF002  Search" style="font-family:Raleway, FontAwesome"  type="text" ng-model="findfollowing"/></li>
+					<ul class="list-group list-group-lg card-ul">
+					<li class="list-group-item" ng-repeat="person in followings | filter: {username : findfollowing}">
+						<div class="media row">
+							<div class="media-left with_button">
+								<img src="{{person.profile_picture}}" class="media-object thumb-sm br-radius">
 							</div>
-							<div class="acting col-sm-3">
-								<a id="{{person.id}}" data-target="" ng-click="unfollow()" role="button"  class="follow-button follow-red pull-right" name="unfollow">Unfollow</a>
+							<div class="media-body">
+								<div class="pull-left">
+									<a href="http://instagram.com/{{person.username}}" target="_blank">{{person.username}}</a>
+								</div>
+								<div class="pull-right">
+									<a id="{{person.id}}" ng-click="unfollow()" role="button"  class="follow-button follow-red" name="unfollow">Unfollow</a>
+								</div>
+
 							</div>
 						</div>
 					</li>
 				</ul>
 			</div>
 		</div>
+
+		<!--<div class="col-sm-2">
+			<div class="media">
+			  <div class="media-left">
+
+			  </div>
+			  <div class="media-body">
+				<a href="http://instagram.com/{{person.username}}" target="_blank">{{person.username}}</a>
+			  </div>
+			</div>
+		</div>
+		<div class="acting col-sm-2">
+			<a id="{{person.id}}" ng-click="unfollow()" role="button"  class="follow-button follow-red pull-right" name="unfollow">Unfollow</a>
+		</div>-->
 
 		<div class="col-md-3 col-sm-6">
 			<div class="card-header">
@@ -89,21 +104,21 @@
 				</h4>
 			</div>
 			<div class="card-body">
-				<ul class="list-group list-group-lg">
-					<li class="list-group-item" ng-repeat="person in notFollowings">
-						<div class="card-line row">
-							<div class="col-sm-9">
-								<div class="media">
-								  <div class="media-left">
-									  <img src="{{person.profile_picture}}" class="media-object thumb-sm br-radius">
-								  </div>
-								  <div class="media-body">
-									<a href="http://instagram.com/{{person.username}}" target="_blank">{{person.username}}</a>
-								  </div>
-								</div>
+				<li class="list-group-item searchwrapper"><input class="searchline" placeholder="&#xF002  Search" style="font-family:Raleway, FontAwesome"  type="text" ng-model="findnotfollowing"/></li>
+				<ul class="list-group list-group-lg card-ul">
+					<li class="list-group-item" ng-repeat="person in notFollowings | filter: {username : findnotfollowing}">
+						<div class="media row">
+							<div class="media-left with_button">
+								<img src="{{person.profile_picture}}" class="media-object thumb-sm br-radius">
 							</div>
-							<div class="acting col-sm-3">
-								<a id="{{person.id}}" ng-click="follow()" role="button" class="follow-button follow-green pull-right" name="follow" value="">Follow</a>
+							<div class="media-body">
+								<div class="pull-left">
+									<a href="http://instagram.com/{{person.username}}" target="_blank">{{person.username}}</a>
+								</div>
+								<div class="pull-right">
+									<a id="{{person.id}}" ng-click="follow()" role="button"  class="follow-button follow-green" name="follow">Follow</a>
+								</div>
+
 							</div>
 						</div>
 					</li>
@@ -120,21 +135,21 @@
 				</h4>
 			</div>
 			<div class="card-body">
-				<ul class="list-group list-group-lg">
-					<li class="list-group-item" ng-repeat="person in notFollowers">
-						<div class="card-line row">
-							<div class="col-sm-9">
-								<div class="media">
-								  <div class="media-left">
-									  <img src="{{person.profile_picture}}" class="media-object thumb-sm br-radius">
-								  </div>
-								  <div class="media-body">
-									<a href="">{{person.username}}</a>
-								  </div>
-								</div>
+				<li class="list-group-item searchwrapper"><input class="searchline" placeholder="&#xF002  Search" style="font-family:Raleway, FontAwesome"  type="text" ng-model="findnotfollower"/></li>
+				<ul class="list-group list-group-lg card-ul">
+					<li class="list-group-item" ng-repeat="person in notFollowers | filter: {username : findnotfollowers}">
+						<div class="media row">
+							<div class="media-left with_button">
+								<img src="{{person.profile_picture}}" class="media-object thumb-sm br-radius">
 							</div>
-							<div class="acting col-sm-3">
-								<a id="{{person.id}}" data-target="" ng-click="unfollow()" role="button"  class="follow-button follow-red pull-right" name="unfollow">Unfollow</a>
+							<div class="media-body">
+								<div class="pull-left">
+									<a href="http://instagram.com/{{person.username}}" target="_blank">{{person.username}}</a>
+								</div>
+								<div class="pull-right">
+									<a id="{{person.id}}" ng-click="unfollow()" role="button"  class="follow-button follow-red" name="unfollow">Unfollow</a>
+								</div>
+
 							</div>
 						</div>
 					</li>
@@ -168,9 +183,29 @@
 
 		   </div>
 		 </div>
+		 <div class="clearfix">
+
+		 </div>
+		 <br>
+		 <br>
 		 <h5>Changes may take some time to take effect. Users with private profile need to accept your follow requests.</h5>
 
-		<script type="text/javascript">
 
-		</script>
+		 <br><br><br><br><br>
 </div>
+<footer class="footer">
+	<div class="container">
+		<div class="row footer-wrapper">
+			<div class="col-md-4">
+				<a href="#!/terms">Terms of Use</a>
+			</div>
+			<div class="col-md-4">
+				<a href="#!/privacy">Privacy Policy</a>
+
+			</div>
+			<div class="col-md-4">
+				<a href="#!/developer">Meet the developer</a>
+			</div>
+		</div>
+	</div>
+</footer>
