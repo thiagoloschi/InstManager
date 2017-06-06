@@ -9,7 +9,7 @@
 <p>This application utilizes node.js, express.js, mongodb and angular.js among other technologies.</p><br/>
   
 <li><h3>Current Status</h3></li>
-<p>InstManager is now running in SandBox mode while is being reviwed by Instagram.</p><br/>
+<p>InstManager is now running in SandBox mode while is being reviewed by Instagram.</p><br/>
 
 <li><h3>Website</h3></li>
 <p>Although the application is already live at http://instmanager.herokuapp.com, Instagram still needs to review it before it can be used by Instagram users. By now, only SandBox users can utilize InstManager.</p><br/>
