@@ -1,24 +1,33 @@
 # InstManager
 
-<ul>
+1. [Description](#description)
+2. [Technologies](#technologies)
+3. [Status](#status)
+4. [Screencast](#screencast)
+5. [Screenshots](#screenshots)
 
-<li><h3>Description</h3></li>
-<p> (Under Instagram review) InstManager is an Instagram client created with the unique purpose of entertaining Instagram users by providing cool insights and usage statistics from their Instagram accounts. Users will be able to see which of their friends follow them back and will have the ability to follow and unfollow other users.</p><br/>
+### Description
+(Under Instagram review) InstManager is an Instagram client created with the unique purpose of entertaining Instagram users by providing cool insights and usage statistics from their Instagram accounts. Users will be able to see which of their friends follow them back and will have the ability to follow and unfollow other users.
+<br /> 
 
-<li><h3>Technologies</h3></li>
-<p>This application utilizes node.js, express.js, mongodb and angular.js among other technologies.</p><br/>
-  
-<li><h3>Current Status</h3></li>
-<p>InstManager is now running in SandBox mode while is being reviewed by Instagram.</p><br/>
+### Technologies
+This application utilizes node.js, express.js, mongodb and angular.js among other technologies.
+<br />
 
-<li><h3>Website</h3></li>
-<p>Although the application is already live at http://instmanager.herokuapp.com, Instagram still needs to review it before it can be used by Instagram users. By now, only SandBox users can utilize InstManager.</p><br/>
+### Status
+InstManager is now running in SandBox mode while is being reviewed by Instagram.
+<br /> 
 
-<li><h3>Screencast</h3></li>
-<p>A screencast was recorded and posted on my youtube channel at https://www.youtube.com/watch?v=oxg1W7nKnqg</p><br/>
+### Website
+Although the application is already live at http://instmanager.herokuapp.com, Instagram still needs to review it before it can be used by Instagram users. By now, only SandBox users can utilize InstManager.
+<br /> 
 
-<li><h3>Screens</h3></li>
-</ul>
+### Screencast
+A screencast was recorded and posted on my youtube channel at https://www.youtube.com/watch?v=oxg1W7nKnqg
+<br /> 
+
+### Screenshots
+<br /> 
 
 <img src="public/img/main.png"/>
 <h6 align="center">Main Profile</h6>
