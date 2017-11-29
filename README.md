@@ -3,8 +3,9 @@
 1. [Description](#description)
 2. [Technologies](#technologies)
 3. [Status](#status)
-4. [Screencast](#screencast)
-5. [Screenshots](#screenshots)
+4. [Website](#website)
+5. [Screencast](#screencast)
+6. [Screenshots](#screenshots)
 
 ### Description
 (Under Instagram review) InstManager is an Instagram client created with the unique purpose of entertaining Instagram users by providing cool insights and usage statistics from their Instagram accounts. Users will be able to see which of their friends follow them back and will have the ability to follow and unfollow other users.
