@@ -8,19 +8,21 @@
 6. [Screenshots](#screenshots)
 
 ### Description
-(Under Instagram review) InstManager is an Instagram client created with the unique purpose of entertaining Instagram users by providing cool insights and usage statistics from their Instagram accounts. Users will be able to see which of their friends follow them back and will have the ability to follow and unfollow other users.
+InstManager is an Instagram client created with the unique purpose of entertaining Instagram users by providing cool insights and usage statistics from their Instagram accounts. Users will be able to see which of their friends follow them back and will have the ability to follow and unfollow other users.
 <br /> 
 
 ### Technologies
-This application utilizes node.js, express.js, mongodb and angular.js among other technologies.
+This application uses Nodejs, Expressjs, MongoDB and Angularjs among other technologies.
 <br />
 
 ### Status
-InstManager is now running in SandBox mode while is being reviewed by Instagram.
+InstManager is running in SandBox mode, which means I must give you a valid key in order for you to try it. The reason why it is not running in its full version, is that Instagram denied the use of their API in production mode, for the uses cases I presented. :(
+
+You are still able to try it, though. Just send me a message and I'll whitelist your credentials.
 <br /> 
 
 ### Website
-Although the application is already live at http://instmanager.herokuapp.com, Instagram still needs to review it before it can be used by Instagram users. By now, only SandBox users can utilize InstManager.
+Although the application is already live at https://instmanager.herokuapp.com, only SandBox users can try InstManager. Send me an email to: thiagoloschi@gmail.com if you'd like to give it a try.
 <br /> 
 
 ### Screencast
