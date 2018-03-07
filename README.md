@@ -12,7 +12,7 @@ InstManager is an Instagram client created with the unique purpose of entertaini
 <br /> 
 
 ### Technologies
-This application uses Nodejs, Expressjs, MongoDB and Angularjs among other technologies.
+This application uses Nodejs, Expressjs, MongoDB, Angularjs, Lodash, and other technologies.
 <br />
 
 ### Status
