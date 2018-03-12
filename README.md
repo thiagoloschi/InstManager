@@ -16,9 +16,9 @@ This application uses Nodejs, Expressjs, MongoDB, Angularjs, Lodash, and other t
 <br />
 
 ### Status
-InstManager is running in SandBox mode, which means I must give you a valid key in order for you to try it. The reason why it is not running in its full version, is that Instagram denied the use of their API in production mode, for the uses cases I presented. :(
+InstManager is running in SandBox mode, which means I must give you a valid key in order for you to try it. The reason why it is not running in its full version, is that unfortunately, Instagram didn't believe the uses cases I presented were a match to any of the three use cases they support. :(
 
-You are still able to try it, though. Just send me a message and I'll whitelist your credentials.
+You are still able to try it, though. Just send me a message and I'll whitelist your profile so you can login.
 <br /> 
 
 ### Website
